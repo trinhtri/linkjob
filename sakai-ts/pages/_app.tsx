@@ -8,7 +8,8 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import '../styles/layout/layout.scss';
 import '../styles/demo/Demos.scss';
-
+import { QueryClient, QueryClientProvider } from 'react-query';
+const queryClient = new QueryClient();
 type Props = AppProps & {
     Component: Page;
 };
@@ -19,9 +20,11 @@ export default function MyApp({ Component, pageProps }: Props) {
     } else {
         return (
             <LayoutProvider>
-                <Layout>
-                    <Component {...pageProps} />
-                </Layout>
+                <QueryClientProvider client={queryClient}>
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
+                </QueryClientProvider>
             </LayoutProvider>
         );
     }

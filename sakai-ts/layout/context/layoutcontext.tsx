@@ -1,8 +1,18 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useEffect } from 'react';
 import { LayoutState, ChildContainerProps, LayoutConfig, LayoutContextProps } from '../../types/types';
+import { useRouter } from 'next/router';
 export const LayoutContext = createContext({} as LayoutContextProps);
 
 export const LayoutProvider = ({ children }: ChildContainerProps) => {
+    const router = useRouter();
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            var accessToken = localStorage.getItem('access_token');
+            if (!accessToken || accessToken == 'undefined') {
+                router.push('/auth/login');
+            }
+        }
+    }, []);
     const [layoutConfig, setLayoutConfig] = useState<LayoutConfig>({
         ripple: false,
         inputStyle: 'outlined',
