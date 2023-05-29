@@ -9,7 +9,7 @@ import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
 import CreateUser from '../../components/users/CreateUser';
 import { Paginator } from 'primereact/paginator';
-import { rowsPerPageOptions } from '../utilities/constant';
+import { rowsPerPageOptions } from '../../public/constant';
 
 import debounce from 'lodash.debounce';
 import { userService } from '../../services/user/userService';
