@@ -3,7 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import React from 'react';
 import { FieldErrors, UseFormRegister } from 'react-hook-form';
-import { ChangePasswordDto } from '../../services/user/dto/changePasswordDto';
+import { ChangePasswordDto } from '../../pages/api/user/dto/changePasswordDto';
 
 interface Props {
     visible: boolean;

@@ -10,16 +10,18 @@
         "lint:fix": "next lint --fix"
     },
     "dependencies": {
+        "@hookform/resolvers": "^2.9.11",
         "@types/node": "18.15.11",
         "@types/react": "18.0.34",
         "@types/react-dom": "18.0.11",
         "@types/react-transition-group": "^4.4.1",
-        "@hookform/resolvers": "^2.9.11",
         "axios": "^1.4.0",
         "chart.js": "4.2.1",
         "eslint": "8.38.0",
         "eslint-config-next": "13.3.0",
+        "lodash.debounce": "^4.0.8",
         "next": "13.2.3",
+        "next-auth": "^4.22.1",
         "primeflex": "3.3.0",
         "primeicons": "^6.0.1",
         "primereact": "9.2.3",
@@ -32,6 +34,7 @@
         "yup": "^1.2.0"
     },
     "devDependencies": {
+        "@types/lodash.debounce": "^4.0.7",
         "sass": "^1.58.3"
     }
 }

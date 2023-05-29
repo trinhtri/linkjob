@@ -9,55 +9,52 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from 'react-query';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import ChangePassword from '../../components/users/ChangePassword';
 import { Menu } from 'primereact/menu';
 import CreateUser from '../../components/users/CreateUser';
 import { Paginator } from 'primereact/paginator';
 import { CreateOrUpdateUserDto } from '../api/user/dto/createOrUpdateUserDto';
 import { ChangePasswordDto } from '../api/user/dto/changePasswordDto';
 import { userService } from '../api/user/userService';
+import { rowsPerPageOptions } from '../utilities/constant';
+
+import debounce from 'lodash.debounce';
 
 const Users = () => {
-    const [visible, setVisible] = useState(false);
-    const [visibleChangePassword, setVisibleChangePassword] = useState(false);
+    const [visibleCreateUser, setVisibleCreateUser] = useState<boolean>(false);
+    const [visibleChangePassword, setVisibleChangePassword] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
-    const [filterSearch, setFilterSearch] = useState(null);
     const menu = useRef<Menu>(null);
     const [currentId, setCurrentId] = useState<string>("");
 
     const [lazyState, setlazyState] = useState({
         first: 0,
-        rows: 10,
-        page: 1,
-        sortField: "",
-        sortOrder: null,
+        pageNumber: 1,
+        pageSize: 10,
+        sortField: "userName",
+        sortOrder: 1,
         filterSearch: null
     });
 
-    // const { data, isLoading, refetch } = useQuery(
-    //     ['Users', filterSearch, pageNumber, pageSize, sorting],
-    //     () => {
-    //         const param = {
-    //             filterSearch: filterSearch,
-    //             pageNumber: pageNumber,
-    //             pageSize: pageSize,
-    //             sorting: sorting
-    //         };
-    //         return userService.getsPaging(param);
-    //     },
-    //     {
-    //         enabled: true,
-    //         keepPreviousData: true
-    //     }
-    // );
+    const handleSearch = (event: any) => {
+        setlazyState({
+            ...lazyState,
+            filterSearch: event.target.value
+        })
+    }
+    const debouncedSearch = debounce(handleSearch, 600);
+
     const { data, isLoading, refetch } = useQuery(
         ['Users', lazyState],
         () => {
+            let sorting = "";
+            if (!!lazyState.sortField && !!lazyState.sortOrder) {
+                sorting = `${lazyState.sortField} ${lazyState.sortOrder === 1 ? "ASC" : "DESC"}`;
+            }
             const param = {
-                filterSearch: filterSearch,
-                pageNumber: pageNumber,
-                pageSize: pageSize,
+                filterSearch: lazyState.filterSearch,
+                pageNumber: lazyState.pageNumber,
+                pageSize: lazyState.pageSize,
                 sorting: sorting
             };
             return userService.getsPaging(param);
@@ -69,35 +66,20 @@ const Users = () => {
     );
 
     const onSort = (event: any) => {
-        setlazyState(event);
+        setlazyState({
+            ...lazyState,
+            sortOrder: event.sortOrder,
+            sortField: event.sortField,
+        })
     };
 
     const onPageChange = (event: any) => {
-        setlazyState(event);
-        // setPageSize(e.rows);
-        // setPageNumber(e.page + 1);
+        setlazyState({
+            ...lazyState,
+            pageNumber: event.page + 1,
+            pageSize: event.rows
+        })
     }
-
-    const validationSchema = yup.object().shape({
-        email: yup.string().required('Email is required').email('Email is invalid'),
-        userName: yup.string().required('User name is required'),
-        password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-        confirmPassword: yup
-            .string()
-            .oneOf([yup.ref('password'), null], 'Passwords must match')
-            .required('Confirm Password is required')
-    });
-
-    const {
-        register,
-        handleSubmit,
-        reset,
-        getValues,
-        formState: { errors }
-    } = useForm<CreateOrUpdateUserDto>({
-        mode: 'onBlur',
-        resolver: yupResolver(validationSchema)
-    });
 
     const validationSchemaChangePassword = yup.object().shape({
         currentPassword: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
@@ -116,8 +98,6 @@ const Users = () => {
         mode: 'onBlur',
         resolver: yupResolver(validationSchemaChangePassword)
     });
-
-
 
     const deleteUserMutation = useMutation((userId) => userService.delete(userId));
     const confirmDelete = (data: any) => {
@@ -138,25 +118,16 @@ const Users = () => {
     };
 
     const onCreate = () => {
-        setVisible(true);
+        setVisibleCreateUser(true);
     };
-    const addUserMutation = useMutation((newUser) => userService.create(newUser));
-    const handleCreateOrUpdate = (data: any) => {
-        addUserMutation.mutate(data, {
-            onSuccess: () => {
-                toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Create user successfully', life: 3000 });
-                setVisible(false);
-                reset();
-                refetch();
-            },
-            onError: (error: any) => {
-                toast.current?.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.errors, life: 3000 });
-            }
-        });
-    };
-    const handleCancel = () => {
-        reset();
-        setVisible(false);
+
+    const handleCreatedUser = () => {
+        setVisibleCreateUser(false);
+        refetch();
+    }
+
+    const handleCloseModalCreateUser = () => {
+        setVisibleCreateUser(false);
     };
 
     const onChangePassword = (data: CreateOrUpdateUserDto) => {
@@ -210,8 +181,6 @@ const Users = () => {
         );
     };
 
-    ;
-
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -221,7 +190,7 @@ const Users = () => {
                     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mt-3 mb-3">
                         <div className="col-4">
                             <span className="block mt-2 md:mt-0 p-input-icon-right">
-                                <InputText type="search" onInput={(e: any) => setFilterSearch(e.target.value)} placeholder="Search..." className="w-full" />
+                                <InputText type="search" onChange={debouncedSearch} placeholder="Search..." className="w-full" />
                                 <i className="pi pi-search" />
                             </span>
                         </div>
@@ -240,26 +209,26 @@ const Users = () => {
                         className="datatable-responsive"
                         emptyMessage="No users found."
                         onSort={onSort}
-                        sortField={lazyState.sortField}
                         sortOrder={lazyState.sortOrder}
-                        removableSort >
+                        sortField={lazyState.sortField}
+                    >
                         <Column field="userName" header="UserName" headerStyle={{ minWidth: '15rem' }} sortable></Column>
                         <Column field="email" header="Email" headerStyle={{ minWidth: '27rem' }} sortable></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
                     </DataTable>
 
-                    <Paginator first={pageNumber} rows={pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={[10, 20, 50, 100]} onPageChange={onPageChange} leftContent></Paginator>
+                    <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
 
-                    <CreateUser visible={visible} errors={errors} onCancel={() => handleCancel()} onSubmit={handleSubmit(handleCreateOrUpdate)} register={register} getValues={getValues} isLoading={addUserMutation.isLoading} />
+                    <CreateUser visible={visibleCreateUser} onCancel={() => handleCloseModalCreateUser()} onCreatedUser={handleCreatedUser} />
 
-                    <ChangePassword
+                    {/* <ChangePassword
                         visible={visibleChangePassword}
                         errors={errors}
                         onCancel={() => handleCancelChangePassword()}
                         onSubmit={handleSubmitChangePassword(handleChangePassword)}
                         register={registerChangePassword}
                         isLoading={addUserMutation.isLoading}
-                    />
+                    /> */}
 
                     <ConfirmDialog />
                 </div>
