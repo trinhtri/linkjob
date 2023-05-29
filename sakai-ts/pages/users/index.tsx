@@ -4,20 +4,16 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import React, { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from 'react-query';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
 import CreateUser from '../../components/users/CreateUser';
 import { Paginator } from 'primereact/paginator';
-import { CreateOrUpdateUserDto } from '../api/user/dto/createOrUpdateUserDto';
-import { ChangePasswordDto } from '../api/user/dto/changePasswordDto';
-import { userService } from '../api/user/userService';
 import { rowsPerPageOptions } from '../utilities/constant';
 
 import debounce from 'lodash.debounce';
+import { userService } from '../../services/user/userService';
+import ChangePassword from '../../components/users/ChangePassword';
 
 const Users = () => {
     const [visibleCreateUser, setVisibleCreateUser] = useState<boolean>(false);
@@ -81,24 +77,6 @@ const Users = () => {
         })
     }
 
-    const validationSchemaChangePassword = yup.object().shape({
-        currentPassword: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-        password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-        confirmPassword: yup
-            .string()
-            .oneOf([yup.ref('password'), null], 'Passwords must match')
-            .required('Confirm Password is required')
-    });
-    const {
-        register: registerChangePassword,
-        handleSubmit: handleSubmitChangePassword,
-        reset: resetChangePassword,
-        formState: { errors: errorsChangePassword }
-    } = useForm<ChangePasswordDto>({
-        mode: 'onBlur',
-        resolver: yupResolver(validationSchemaChangePassword)
-    });
-
     const deleteUserMutation = useMutation((userId) => userService.delete(userId));
     const confirmDelete = (data: any) => {
         confirmDialog({
@@ -130,28 +108,12 @@ const Users = () => {
         setVisibleCreateUser(false);
     };
 
-    const onChangePassword = (data: CreateOrUpdateUserDto) => {
+    const onChangePassword = (data: any) => {
         setCurrentId(data.userId);
         setVisibleChangePassword(true);
     };
-    const changePasswordMutation = useMutation((data) => userService.changePassword(data));
-    const handleChangePassword = (data: any) => {
-        const request = {
-            userId: currentId,
-            ...data
-        };
-        changePasswordMutation.mutate(request, {
-            onSuccess: () => {
-                toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Create user successfully', life: 3000 });
-                setVisibleChangePassword(false);
-            },
-            onError: () => {
-                setVisibleChangePassword(false);
-            }
-        });
-    };
+
     const handleCancelChangePassword = () => {
-        resetChangePassword();
         setVisibleChangePassword(false);
     };
 
@@ -221,14 +183,11 @@ const Users = () => {
 
                     <CreateUser visible={visibleCreateUser} onCancel={() => handleCloseModalCreateUser()} onCreatedUser={handleCreatedUser} />
 
-                    {/* <ChangePassword
+                    <ChangePassword
                         visible={visibleChangePassword}
-                        errors={errors}
-                        onCancel={() => handleCancelChangePassword()}
-                        onSubmit={handleSubmitChangePassword(handleChangePassword)}
-                        register={registerChangePassword}
-                        isLoading={addUserMutation.isLoading}
-                    /> */}
+                        currentId={currentId}
+                        onCloseModal={() => handleCancelChangePassword()}
+                    />
 
                     <ConfirmDialog />
                 </div>
