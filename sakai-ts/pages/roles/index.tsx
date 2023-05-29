@@ -11,10 +11,10 @@ import { useMutation, useQuery } from 'react-query';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
 import CreateRole from '../../components/roles/CreateRole';
-import { CreateOrUpdateRoleDto } from '../api/role/dto/createOrUpdateRoleDto';
-import { roleService } from '../api/role/roleService';
-import { userService } from '../api/user/userService';
-import { CreateOrUpdateUserDto } from '../api/user/dto/createOrUpdateUserDto';
+import { CreateOrUpdateRoleDto } from '../../services/role/dto/createOrUpdateRoleDto';
+import { roleService } from '../../services/role/roleService';
+import { userService } from '../../services/user/userService';
+import { CreateOrUpdateUserDto } from '../../services/user/dto/createOrUpdateUserDto';
 
 const Roles = () => {
     const [visible, setVisible] = useState(false);
@@ -80,15 +80,15 @@ const Roles = () => {
         setVisible(true);
     };
     const addUserMutation = useMutation((data) => roleService.create(data));
-    const handleCreateOrUpdate = (data) => {
+    const handleCreateOrUpdate = (data: any) => {
         addUserMutation.mutate(data, {
             onSuccess: () => {
-                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Thêm mới quyền thành công', life: 3000 });
+                toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Thêm mới quyền thành công', life: 3000 });
                 setVisible(false);
                 refetch();
             },
             onError: (error: any) => {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.errors, life: 3000 });
+                toast.current?.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.errors, life: 3000 });
                 setVisible(false);
             }
         });
@@ -105,12 +105,12 @@ const Roles = () => {
         setVisible(true);
     };
 
-    const menu = useRef(null);
-    const actionBodyTemplate = (rowData) => {
+    const menu = useRef<Menu>(null);
+    const actionBodyTemplate = (rowData: any) => {
         return (
             <>
                 <span className="p-column-title">Hành động</span>
-                <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current.toggle(e)} className="p-button-outlined p-button-sm" />
+                <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
                 <Menu
                     ref={menu}
                     popup

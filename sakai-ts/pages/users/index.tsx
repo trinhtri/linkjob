@@ -28,7 +28,7 @@ const Users = () => {
         pageNumber: 1,
         pageSize: 10,
         sortField: "userName",
-        sortOrder: 1,
+        sortOrder: null,
         filterSearch: null
     });
 

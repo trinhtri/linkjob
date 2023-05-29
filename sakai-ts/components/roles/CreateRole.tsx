@@ -3,7 +3,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import React from 'react';
 import { FieldErrors, UseFormGetValues, UseFormRegister } from 'react-hook-form';
-import { CreateOrUpdateRoleDto } from '../../pages/api/role/dto/createOrUpdateRoleDto';
+import { CreateOrUpdateRoleDto } from '../../services/role/dto/createOrUpdateRoleDto';
 
 interface Props {
     visible: boolean;

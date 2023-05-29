@@ -10,11 +10,11 @@ import { LayoutContext } from '../../../layout/context/layoutcontext';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { Page } from '../../../types/types';
-import { userService } from '../../api/user/userService';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Toast } from 'primereact/toast';
+import { userService } from '../../../services/user/userService';
 
 interface ILoginDto {
     email: string;
