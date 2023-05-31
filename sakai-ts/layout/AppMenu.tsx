@@ -13,7 +13,10 @@ const AppMenu = () => {
     const model: AppMenuItem[] = [
         {
             label: 'Home',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+            items: [
+                { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
+                { label: 'Candidates', icon: 'pi pi-fw pi-users', to: '/candidates' }
+            ]
         },
         {
             label: 'Admin',

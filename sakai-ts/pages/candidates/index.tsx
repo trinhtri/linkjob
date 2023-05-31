@@ -14,8 +14,10 @@ import { rowsPerPageOptions } from '../../public/constant';
 import debounce from 'lodash.debounce';
 import { userService } from '../../services/user/userService';
 import ChangePassword from '../../components/users/ChangePassword';
+import { candidateService } from '../../services/candidate/candidateService';
+import { useRouter } from 'next/router';
 
-const Users = () => {
+const Candidates = () => {
     const [visibleCreateUser, setVisibleCreateUser] = useState<boolean>(false);
     const [visibleChangePassword, setVisibleChangePassword] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
@@ -53,7 +55,7 @@ const Users = () => {
                 pageSize: lazyState.pageSize,
                 sorting: sorting
             };
-            return userService.getsPaging(param);
+            return candidateService.getsPaging(param);
         },
         {
             enabled: true,
@@ -95,8 +97,9 @@ const Users = () => {
         });
     };
 
+    const router = useRouter();
     const onCreate = () => {
-        setVisibleCreateUser(true);
+        router.push("/candidates/create");
     };
 
     const handleCreatedUser = () => {
@@ -124,7 +127,7 @@ const Users = () => {
     const actionBodyTemplate = (rowData: any) => {
         return (
             <>
-                <Button label="Actions" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
+                <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
                 <Menu
                     ref={menu}
                     popup
@@ -148,7 +151,7 @@ const Users = () => {
             <div className="col-12">
                 <div className="card">
                     <Toast ref={toast} />
-                    <h5 className="mt-0">Quản lý người dùng</h5>
+                    <h5 className="mt-0">Quản lý ứng viên</h5>
                     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mt-3 mb-3">
                         <div className="col-4">
                             <span className="block mt-2 md:mt-0 p-input-icon-right">
@@ -166,7 +169,7 @@ const Users = () => {
                     <DataTable
                         ref={dt}
                         value={data?.data?.items}
-                        dataKey="userId"
+                        dataKey="id"
                         loading={isLoading}
                         className="datatable-responsive"
                         emptyMessage="No users found."
@@ -174,9 +177,17 @@ const Users = () => {
                         sortOrder={lazyState.sortOrder}
                         sortField={lazyState.sortField}
                     >
-                        <Column field="userName" header="UserName" headerStyle={{ minWidth: '15rem' }} sortable></Column>
-                        <Column field="email" header="Email" headerStyle={{ minWidth: '27rem' }} sortable></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
+                        <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="gioiTinh" header="Giới tính" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="truong" header="Trường" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="nganh" header="Chuyên nghành" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} sortable></Column>
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                     </DataTable>
 
                     <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
@@ -195,4 +206,4 @@ const Users = () => {
         </div>
     );
 };
-export default Users;
+export default Candidates;
