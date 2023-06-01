@@ -15,7 +15,7 @@ export interface CreateOrEditCandidateRequest {
   queQuan: string;
   choOHienTai: string;
   nguyenVong: string;
-  ngonNgu: string;
+  ngonNgu: string[];
   cvName: string;
   cvUrl: string;
 }

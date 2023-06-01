@@ -1,4 +1,4 @@
-export interface GetCandidateResponse {
+export interface CandidateResponse {
   id: string;
   hoTen: string;
   sdt: string;

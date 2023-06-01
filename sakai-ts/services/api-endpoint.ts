@@ -3,5 +3,6 @@ export const ApiEndpoint = {
   refreshToken: "/auth/refresh-token",
   user: "users",
   candidate: "candidates",
+  commonLookup: "common-lookup",
   role: "roles",
 };
