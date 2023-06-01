@@ -16,6 +16,7 @@ import { userService } from '../../services/user/userService';
 import ChangePassword from '../../components/users/ChangePassword';
 import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
+import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 
 const Candidates = () => {
     const [visibleCreateUser, setVisibleCreateUser] = useState<boolean>(false);
@@ -124,26 +125,34 @@ const Candidates = () => {
         dt.current.exportCSV();
     };
 
-    const actionBodyTemplate = (rowData: any) => {
-        return (
-            <>
-                <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
-                <Menu
-                    ref={menu}
-                    popup
-                    model={[
-                        {
-                            label: 'Change password',
-                            command: () => onChangePassword(rowData)
-                        },
-                        {
-                            label: 'Delete',
-                            command: () => confirmDelete(rowData)
-                        }
-                    ]}
-                />
-            </>
-        );
+    const onEdit = (data: any) => {
+        console.log("data", data)
+        router.push(`/candidates/${data.id}`);
+    }
+
+    const actionBodyTemplate = (rowData: CandidateResponse) => {
+        return (<>
+            <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={(e) => onEdit(rowData)} />
+        </>);
+        // return (
+        //     <>
+        //         <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
+        //         <Menu
+        //             ref={menu}
+        //             popup
+        //             model={[
+        //                 {
+        //                     label: 'Chỉnh sửa',
+        //                     command: () => onEdit(rowData)
+        //                 },
+        //                 {
+        //                     label: 'Delete',
+        //                     command: () => confirmDelete(rowData)
+        //                 }
+        //             ]}
+        //         />
+        //     </>
+        // );
     };
 
     return (
@@ -187,7 +196,11 @@ const Candidates = () => {
                         <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} sortable></Column>
                         <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} sortable></Column>
                         <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}>
+                            <div>
+                                demo
+                            </div>
+                        </Column>
                     </DataTable>
 
                     <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
