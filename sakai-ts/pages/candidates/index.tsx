@@ -3,7 +3,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
@@ -13,18 +13,29 @@ import { rowsPerPageOptions } from '../../public/constant';
 
 import debounce from 'lodash.debounce';
 import { userService } from '../../services/user/userService';
-import ChangePassword from '../../components/users/ChangePassword';
 import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
+import { TabMenu } from 'primereact/tabmenu';
+import SendCV from '../../components/candidates/sendCV';
+import SetInterviewSchedule from '../../components/candidates/setInterviewSchedule';
+import SetPassInterview from '../../components/candidates/setPassInterview';
+import { MultiSelect } from 'primereact/multiselect';
+import { CommonLookupRequest } from '../../services/commonLookup/dto/commonLookupRequest';
+import { commonLookupService } from '../../services/commonLookup/commonLookupService';
+import { Calendar } from 'primereact/calendar';
 
 const Candidates = () => {
     const [visibleCreateUser, setVisibleCreateUser] = useState<boolean>(false);
-    const [visibleChangePassword, setVisibleChangePassword] = useState<boolean>(false);
+    const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
+    const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
+    const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
-    const menu = useRef<Menu>(null);
     const [currentId, setCurrentId] = useState<string>("");
+
+    const filterIndex = localStorage.getItem("filterIndex")?.toString();
+    const [activeIndex, setActiveIndex] = useState<number>(0);
 
     const [lazyState, setlazyState] = useState({
         first: 0,
@@ -32,8 +43,21 @@ const Candidates = () => {
         pageSize: 10,
         sortField: "UserName",
         sortOrder: null,
-        filterSearch: null
+        filterSearch: null,
+        status: 0,
+        startDate: null,
+        endDate: null,
+        languages: []
     });
+
+    useEffect(() => {
+        if (!!filterIndex) {
+            setActiveIndex(parseInt(filterIndex));
+            setlazyState({ ...lazyState, status: parseInt(filterIndex) });
+        }
+    }, []);
+
+
 
     const handleSearch = (event: any) => {
         setlazyState({
@@ -54,7 +78,11 @@ const Candidates = () => {
                 filterSearch: lazyState.filterSearch,
                 pageNumber: lazyState.pageNumber,
                 pageSize: lazyState.pageSize,
-                sorting: sorting
+                status: lazyState.status,
+                sorting: sorting,
+                languages: lazyState.languages,
+                startDate: lazyState.startDate,
+                endDate: lazyState.endDate
             };
             return candidateService.getsPaging(param);
         },
@@ -64,6 +92,19 @@ const Candidates = () => {
         }
     );
 
+    const { data: countForStatus, refetch: refetchCountForStatus } = useQuery(
+        ['CountForStatus'],
+        () => { return candidateService.getCountForStatus(); },
+    );
+
+    const wizardItems = [
+        { id: "0", label: `Đang tìm việc (${countForStatus?.data.dangTimViec})` },
+        { id: "1", label: `Đang ứng tuyển (${countForStatus?.data.dangHoTro})` },
+        { id: "2", label: `Lịch phỏng vấn (${countForStatus?.data.lichPV})` },
+        { id: "3", label: `Đã trúng tuyển (${countForStatus?.data.daTrungTuyen})` },
+        { id: "4", label: `Đã hoàn thành (${countForStatus?.data.daHoanThanh})` },
+    ];
+
     const onSort = (event: any) => {
         setlazyState({
             ...lazyState,
@@ -71,6 +112,12 @@ const Candidates = () => {
             sortField: event.sortField,
         })
     };
+
+    const onChangeTab = (event: any) => {
+        setActiveIndex(event.index);
+        setlazyState({ ...lazyState, status: event.index });
+        localStorage.setItem("filterIndex", event.value.id);
+    }
 
     const onPageChange = (event: any) => {
         setlazyState({
@@ -98,6 +145,23 @@ const Candidates = () => {
         });
     };
 
+    const confirmAcceptOffer = (data: any) => {
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên đã nhận Offer?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                deleteUserMutation.mutate(data.userId, {
+                    onSuccess() {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
+                        refetch();
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
+
     const router = useRouter();
     const onCreate = () => {
         router.push("/candidates/create");
@@ -111,69 +175,154 @@ const Candidates = () => {
     const handleCloseModalCreateUser = () => {
         setVisibleCreateUser(false);
     };
-
-    const onChangePassword = (data: any) => {
-        setCurrentId(data.userId);
-        setVisibleChangePassword(true);
-    };
-
-    const handleCancelChangePassword = () => {
-        setVisibleChangePassword(false);
-    };
-
     const exportCSV = () => {
         dt.current.exportCSV();
     };
 
     const onEdit = (data: any) => {
-        console.log("data", data)
         router.push(`/candidates/${data.id}`);
     }
 
-    const actionBodyTemplate = (rowData: CandidateResponse) => {
-        return (<>
-            <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={(e) => onEdit(rowData)} />
-        </>);
-        // return (
-        //     <>
-        //         <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
-        //         <Menu
-        //             ref={menu}
-        //             popup
-        //             model={[
-        //                 {
-        //                     label: 'Chỉnh sửa',
-        //                     command: () => onEdit(rowData)
-        //                 },
-        //                 {
-        //                     label: 'Delete',
-        //                     command: () => confirmDelete(rowData)
-        //                 }
-        //             ]}
-        //         />
-        //     </>
-        // );
+    const onSendCV = (data: any) => {
+        setCurrentId(data.id);
+        setVisibleSendCV(true);
+    }
+    const handleCancelChangeSendCV = () => {
+        setVisibleSendCV(false);
+        refetch();
     };
+
+    const onSetInterviewSchedule = (data: any) => {
+        setCurrentId(data.id);
+        setVisibleSchedule(true);
+    }
+    const handleCancelInterviewSchedule = () => {
+        setVisibleSchedule(false);
+        refetch();
+    };
+
+    const onSetPassInterview = (data: any) => {
+        setCurrentId(data.id);
+        setVisiblePassInterview(true);
+    }
+
+    const handleCancelPassInterview = () => {
+        setVisiblePassInterview(false);
+        refetch();
+    };
+
+
+
+    const actionBodyTemplate = (rowData: CandidateResponse) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const menu = useRef<Menu>(null);
+        return (
+            <>
+                <Button icon="pi pi-ellipsis-h" rounded severity="secondary" onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
+                <Menu
+                    ref={menu}
+                    popup
+                    model={[
+                        {
+                            label: 'Gửi CV',
+                            command: () => onSendCV(rowData)
+                        },
+                        {
+                            label: 'Đặt lịch phỏng vấn',
+                            command: () => onSetInterviewSchedule(rowData)
+                        },
+                        {
+                            label: 'Đã trúng tuyển',
+                            command: () => onSetPassInterview(rowData)
+                        },
+                        {
+                            label: 'Nhận offer',
+                            command: () => confirmAcceptOffer(rowData)
+                        },
+                        {
+                            label: 'Chỉnh sửa',
+                            command: () => onEdit(rowData)
+                        },
+                        {
+                            label: 'Delete',
+                            command: () => confirmDelete(rowData)
+                        }
+                    ]}
+                />
+            </>
+        );
+    };
+
+    const { data: languages } = useQuery(
+        ["Languages"],
+        () => {
+            let param = {
+                type: "Language"
+            } as CommonLookupRequest;
+            return commonLookupService.getLookup(param);
+        },
+    );
 
     return (
         <div className="grid crud-demo">
             <div className="col-12">
                 <div className="card">
                     <Toast ref={toast} />
-                    <h5 className="mt-0">Quản lý ứng viên</h5>
-                    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mt-3 mb-3">
-                        <div className="col-4">
-                            <span className="block mt-2 md:mt-0 p-input-icon-right">
-                                <InputText type="search" onChange={debouncedSearch} placeholder="Search..." className="w-full" />
-                                <i className="pi pi-search" />
-                            </span>
-                        </div>
+                    <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mb-3">
+                        <h5 className="mt-0">Quản lý ứng viên</h5>
 
                         <div>
                             <Button label="Export" icon="pi pi-upload" className="p-button-help mr-2 p-button-sm" onClick={exportCSV} />
                             <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success mr-2 p-button-sm" onClick={onCreate} />
                         </div>
                     </div>
+
+                    <div className='flex'>
+                        <div className="col-3">
+                            <span className="block mt-2 md:mt-0 p-input-icon-right">
+                                <InputText type="search" onChange={debouncedSearch} placeholder="Nhập từ khóa tìm kiếm" className="w-full" />
+                                <i className="pi pi-search" />
+                            </span>
+                        </div>
+                        <div className="col-3">
+                            <MultiSelect
+                                inputId="multiselect"
+                                value={lazyState.languages}
+                                optionValue="value"
+                                optionLabel="label"
+                                placeholder="Chọn ngôn ngữ"
+                                className={`form-control w-full `}
+                                options={languages?.data}
+                                onChange={(e) =>
+                                    setlazyState({ ...lazyState, languages: e.value })
+                                }
+                            />
+                        </div>
+                        <div className="col-3">
+                            <Calendar
+                                placeholder='Ngày bắt đầu'
+                                dateFormat="dd/mm/yy"
+                                showButtonBar
+                                className={`form-control w-full `}
+                                value={lazyState.startDate}
+                                onChange={(e: any) =>
+                                    setlazyState({ ...lazyState, startDate: e.value })
+                                }
+                            ></Calendar>
+                        </div>
+                        <div className="col-3">
+                            <Calendar dateFormat="dd/mm/yy"
+                                placeholder='Ngày kết thúc'
+                                value={lazyState.endDate}
+                                showButtonBar
+                                className={`form-control w-full `}
+                                onChange={(e: any) =>
+                                    setlazyState({ ...lazyState, endDate: e.value })
+                                }
+                            ></Calendar>
+                        </div>
+                    </div>
+                    <TabMenu model={wizardItems} activeIndex={activeIndex} onTabChange={(e) => onChangeTab(e)} />
 
                     <DataTable
                         ref={dt}
@@ -186,33 +335,38 @@ const Candidates = () => {
                         sortOrder={lazyState.sortOrder}
                         sortField={lazyState.sortField}
                     >
-                        <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="gioiTinh" header="Giới tính" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="truong" header="Trường" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="nganh" header="Chuyên nghành" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} sortable></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}>
-                            <div>
-                                demo
-                            </div>
-                        </Column>
+                        <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="gioiTinh" header="Giới tính" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="truong" header="Trường" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="nganh" header="Chuyên nghành" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                     </DataTable>
 
                     <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
 
                     <CreateUser visible={visibleCreateUser} onCancel={() => handleCloseModalCreateUser()} onCreatedUser={handleCreatedUser} />
 
-                    <ChangePassword
-                        visible={visibleChangePassword}
+                    <SendCV
+                        visible={visibleSendCV}
                         currentId={currentId}
-                        onCloseModal={() => handleCancelChangePassword()}
+                        onCloseModal={() => handleCancelChangeSendCV()}
                     />
-
+                    <SetInterviewSchedule
+                        visible={visibleSchedule}
+                        currentId={currentId}
+                        onCloseModal={() => handleCancelInterviewSchedule()}
+                    />
+                    <SetPassInterview
+                        visible={visiblePassInterview}
+                        currentId={currentId}
+                        onCloseModal={() => handleCancelPassInterview()}
+                    />
                     <ConfirmDialog />
                 </div>
             </div>

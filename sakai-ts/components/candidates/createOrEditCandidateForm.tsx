@@ -79,7 +79,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
     });
 
     useEffect(() => {
-        console.log("candidateDetail", candidateDetail)
         if (candidateDetail) {
             setValue('id', candidateDetail.data.id);
             setValue('hoTen', candidateDetail.data.hoTen);
@@ -176,7 +175,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                         <InputText
                             id="name"
                             required
-                            placeholder="Họ và tên"
                             autoFocus
                             {...register("hoTen")}
                             className={`form-control ${errors.hoTen ? "p-invalid" : ""}`}
@@ -190,7 +188,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                         <InputText
                             id="sdt"
                             required
-                            placeholder="Số điện thoại"
                             {...register("sdt")}
                             className={`form-control ${errors.sdt ? "p-invalid" : ""}`}
                         />
@@ -204,7 +201,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             id="email"
                             {...register("email")}
                             className={`form-control ${errors.email ? "p-invalid" : ""}`}
-                            placeholder="Email"
                         />
                         <small className="p-error">
                             {errors.email?.message?.toString()}
@@ -217,7 +213,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("bangCap")}
                             className={`form-control ${errors.bangCap ? "p-invalid" : ""
                                 }`}
-                            placeholder="Bằng cấp"
                         />
                         <small className="p-error">
                             {errors.bangCap?.message?.toString()}
@@ -232,7 +227,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("gioiTinh")}
                             optionLabel="label"
                             optionValue="value"
-                            placeholder="Chọn giới tính"
                             className={`form-control ${errors.gioiTinh ? "p-invalid" : ""
                                 }`}
                             onChange={(e) =>
@@ -252,7 +246,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("namSinh")}
                             className={`form-control ${errors.namSinh ? "p-invalid" : ""
                                 }`}
-                            placeholder="Năm sinh"
                         />
                         <small className="p-error">
                             {errors.namSinh?.message?.toString()}
@@ -266,7 +259,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("danhGiaNgonNgu")}
                             className={`form-control ${errors.danhGiaNgonNgu ? "p-invalid" : ""
                                 }`}
-                            placeholder="Đánh giá ngôn ngữ"
                         />
                         <small className="p-error">
                             {errors.danhGiaNgonNgu?.message?.toString()}
@@ -279,7 +271,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("luongMongMuon")}
                             className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""
                                 }`}
-                            placeholder="Lương mong muốn"
                         />
                         <small className="p-error">
                             {errors.luongMongMuon?.message?.toString()}
@@ -291,7 +282,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             id="nganh"
                             {...register("nganh")}
                             className={`form-control ${errors.nganh ? "p-invalid" : ""}`}
-                            placeholder="Chuyên nghành"
                         />
                         <small className="p-error">
                             {errors.nganh?.message?.toString()}
@@ -303,7 +293,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             id="truong"
                             {...register("truong")}
                             className={`form-control ${errors.truong ? "p-invalid" : ""}`}
-                            placeholder="Trường"
                         />
                         <small className="p-error">
                             {errors.truong?.message?.toString()}
@@ -316,7 +305,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("kinhNghiem")}
                             className={`form-control ${errors.kinhNghiem ? "p-invalid" : ""
                                 }`}
-                            placeholder="Kinh nghiệm"
                         />
                         <small className="p-error">
                             {errors.kinhNghiem?.message?.toString()}
@@ -329,7 +317,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("choOHienTai")}
                             className={`form-control ${errors.choOHienTai ? "p-invalid" : ""
                                 }`}
-                            placeholder="Chỗ ở hiện tại"
                         />
                         <small className="p-error">
                             {errors.choOHienTai?.message?.toString()}
@@ -342,7 +329,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("nguyenVong")}
                             className={`form-control ${errors.nguyenVong ? "p-invalid" : ""
                                 }`}
-                            placeholder="Nguyện vọng"
                         />
                         <small className="p-error">
                             {errors.nguyenVong?.message?.toString()}
@@ -355,7 +341,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             value={getValues("ngonNgu")}
                             optionValue="value"
                             optionLabel="label"
-                            placeholder="Chọn ngôn ngữ"
                             className={`form-control ${errors.ngonNgu ? "p-invalid" : ""
                                 }`}
                             options={languages?.data}
@@ -375,7 +360,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             id="facebook"
                             {...register("facebook")}
                             className={`form-control`}
-                            placeholder="Facebook"
                         />
                     </div>
                     <div className="field col-12 md:col-6">
@@ -385,7 +369,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             {...register("queQuan")}
                             className={`form-control ${errors.queQuan ? "p-invalid" : ""
                                 }`}
-                            placeholder="Quê quán"
                         />
                         <small className="p-error">
                             {errors.queQuan?.message?.toString()}
