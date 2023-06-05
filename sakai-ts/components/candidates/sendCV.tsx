@@ -42,6 +42,23 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
         },
     );
 
+    const { data: companiesSelected } = useQuery(
+        ["CompaniesByCandidateId"],
+        () => {
+            return candidateService.getCompaniesByCandidateId(currentId);
+        },
+        {
+            enabled: !!currentId
+        }
+    );
+
+    useEffect(() => {
+        setSelectedItems([]);
+        if (companiesSelected?.data) {
+            setSelectedItems(companiesSelected.data)
+        }
+    }, []);
+
     const validationSchema = yup.object().shape({
         ctyNhan: yup.array().min(1, "Vui lòng chọn cty"),
     });
@@ -58,15 +75,13 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
     });
 
     useEffect(() => {
-        setSelectedItems([]);
         if (currentId)
             setValue("id", currentId);
     }, [currentId, setValue, visible]);
 
     const sendCVMutation = useMutation((data: SendCVRequest) => candidateService.sendCV(data));
     const onSubmit = (data: SendCVRequest) => {
-        console.log("onSubmit", currentId)
-        console.log("data", data)
+
         const request = {
             ...data
         };

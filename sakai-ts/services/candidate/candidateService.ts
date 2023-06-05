@@ -2,6 +2,7 @@ import api from "../api";
 import { ApiEndpoint } from "../api-endpoint";
 import { PaginatedList } from "../paginatedList";
 import { AcceptOfferRequest } from "./dto/acceptOfferRequest";
+import { CandidateInterviewResponse } from "./dto/candidateInterviewResponse";
 import { CandidateResponse } from "./dto/candidateResponse";
 import { CountForStatusResponse } from "./dto/countForStatusResponse";
 import { SendCVRequest } from "./dto/sendCVRequest";
@@ -31,6 +32,14 @@ export const candidateService = {
       params: params,
     });
   },
+  getsPagingInterview: (params: any) => {
+    return api.get<PaginatedList<CandidateInterviewResponse>>(
+      `${ApiEndpoint.candidate}/candidates-interview`,
+      {
+        params: params,
+      }
+    );
+  },
   sendCV: (body: SendCVRequest) => {
     return api.put(`${ApiEndpoint.candidate}/send-cv`, body);
   },
@@ -45,5 +54,9 @@ export const candidateService = {
 
   acceptOffer: (body: AcceptOfferRequest) => {
     return api.put(`${ApiEndpoint.candidate}/accept-offer`, body);
+  },
+
+  getCompaniesByCandidateId: (id: string) => {
+    return api.get<string[]>(`${ApiEndpoint.candidate}/${id}/companies`);
   },
 };

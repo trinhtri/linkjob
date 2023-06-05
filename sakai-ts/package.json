@@ -20,6 +20,7 @@
         "eslint": "8.38.0",
         "eslint-config-next": "13.3.0",
         "lodash.debounce": "^4.0.8",
+        "moment": "^2.29.4",
         "next": "13.2.3",
         "next-auth": "^4.22.1",
         "primeflex": "3.3.0",
