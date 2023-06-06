@@ -15,8 +15,9 @@ import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
 import SetInterviewSchedule from './setInterviewSchedule';
-import SetPassInterview from './setPassInterview';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
+import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -70,7 +71,7 @@ const ApplyingForJobsTable = ({ filter }: Props) => {
                 startDate: lazyState.startDate,
                 endDate: lazyState.endDate
             };
-            return candidateService.getsPaging(param);
+            return candidateService.getsPagingAppling(param);
         },
         {
             enabled: !!lazyState,
@@ -176,7 +177,9 @@ const ApplyingForJobsTable = ({ filter }: Props) => {
             </>
         );
     };
-
+    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
+        return formatCurrency(rowData.luongMongMuon as number);
+    };
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -192,12 +195,7 @@ const ApplyingForJobsTable = ({ filter }: Props) => {
                     <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="tenCty" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="truong" header="Trường" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="nganh" header="Chuyên nghành" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>

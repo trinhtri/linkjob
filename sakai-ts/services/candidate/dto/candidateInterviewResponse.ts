@@ -4,7 +4,7 @@ export interface CandidateInterviewResponse {
   sdt: string;
   email: string;
   namSinh: string;
-  luongMongMuon: string;
+  luongMongMuon: number;
   tenCty: string;
   cvName: string;
   cvUrl: string;

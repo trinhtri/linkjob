@@ -40,6 +40,14 @@ export const candidateService = {
       }
     );
   },
+  getsPagingAppling: (params: any) => {
+    return api.get<PaginatedList<CandidateInterviewResponse>>(
+      `${ApiEndpoint.candidate}/candidates-appling`,
+      {
+        params: params,
+      }
+    );
+  },
   sendCV: (body: SendCVRequest) => {
     return api.put(`${ApiEndpoint.candidate}/send-cv`, body);
   },

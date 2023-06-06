@@ -43,21 +43,22 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
     );
 
     const { data: companiesSelected } = useQuery(
-        ["CompaniesByCandidateId"],
+        ["CompaniesByCandidateId", visible],
         () => {
             return candidateService.getCompaniesByCandidateId(currentId);
         },
         {
-            enabled: !!currentId
+            enabled: !!currentId && visible
         }
     );
 
     useEffect(() => {
-        setSelectedItems([]);
         if (companiesSelected?.data) {
             setSelectedItems(companiesSelected.data)
+        } else {
+            setSelectedItems([]);
         }
-    }, []);
+    }, [companiesSelected]);
 
     const validationSchema = yup.object().shape({
         ctyNhan: yup.array().min(1, "Vui lòng chọn cty"),

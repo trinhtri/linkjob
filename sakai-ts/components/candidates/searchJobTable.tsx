@@ -15,8 +15,8 @@ import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
 import SetInterviewSchedule from './setInterviewSchedule';
-import SetPassInterview from './setPassInterview';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
+import { formatCurrency } from '../../pages/utilities/formatCurrency';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -155,7 +155,9 @@ const SearchJobTable = ({ filter }: Props) => {
         setVisiblePassInterview(false);
         refetch();
     };
-
+    const salaryBodyTemplate = (rowData: any) => {
+        return formatCurrency(rowData.luongMongMuon as number);
+    };
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -216,7 +218,7 @@ const SearchJobTable = ({ filter }: Props) => {
                     <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
@@ -230,11 +232,11 @@ const SearchJobTable = ({ filter }: Props) => {
                     currentId={currentId}
                     onCloseModal={() => handleCancelInterviewSchedule()}
                 />
-                <SetPassInterview
+                {/* <SetPassInterview
                     visible={visiblePassInterview}
                     currentId={currentId}
                     onCloseModal={() => handleCancelPassInterview()}
-                />
+                /> */}
                 <ConfirmDialog />
             </div>
         </div>

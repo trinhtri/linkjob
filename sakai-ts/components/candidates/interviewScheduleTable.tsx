@@ -14,11 +14,12 @@ import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
-import SetInterviewSchedule from './setInterviewSchedule';
-import SetPassInterview from './setPassInterview';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
 import moment from 'moment';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
+import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import SetInterviewSchedule from './setInterviewSchedule';
+import { SetPassInterviewRequest } from '../../services/candidate/dto/setPassInterviewRequest';
 interface Props {
     filter: SearchCandidateCommonRequest,
 }
@@ -105,16 +106,23 @@ const InterviewScheduleTable = ({ filter }: Props) => {
         });
     };
 
-    const confirmAcceptOffer = (data: any) => {
+    const setPassInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setPassInterview(data));
+    const confirmPassInterview = (data: any) => {
         confirmDialog({
-            message: 'Bạn có chắc chắn ứng viên đã nhận Offer?',
+            message: 'Bạn có chắc chắn ứng viên đã đỗ phỏng vấn không?',
             header: 'Xác nhận',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                deleteUserMutation.mutate(data.userId, {
-                    onSuccess() {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
-                        refetch();
+                const request = {
+                    candidateId: data.id,
+                    companyId: data.companyId
+                };
+                setPassInterviewMutation.mutate(request, {
+                    onSuccess: () => {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                    },
+                    onError: (error: any) => {
+                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
                     }
                 });
             },
@@ -137,10 +145,6 @@ const InterviewScheduleTable = ({ filter }: Props) => {
         refetch();
     };
 
-    const onSetInterviewSchedule = (data: any) => {
-        setCurrentId(data.id);
-        setVisibleSchedule(true);
-    }
     const handleCancelInterviewSchedule = () => {
         setVisibleSchedule(false);
         refetch();
@@ -154,6 +158,9 @@ const InterviewScheduleTable = ({ filter }: Props) => {
     const handleCancelPassInterview = () => {
         setVisiblePassInterview(false);
         refetch();
+    };
+    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
+        return formatCurrency(rowData.luongMongMuon as number);
     };
 
     const actionBodyTemplate = (rowData: CandidateResponse) => {
@@ -171,16 +178,8 @@ const InterviewScheduleTable = ({ filter }: Props) => {
                             command: () => onSendCV(rowData)
                         },
                         {
-                            label: 'Đặt lịch phỏng vấn',
-                            command: () => onSetInterviewSchedule(rowData)
-                        },
-                        {
                             label: 'Đã trúng tuyển',
-                            command: () => onSetPassInterview(rowData)
-                        },
-                        {
-                            label: 'Nhận offer',
-                            command: () => confirmAcceptOffer(rowData)
+                            command: () => confirmPassInterview(rowData)
                         },
                         {
                             label: 'Chỉnh sửa',
@@ -214,7 +213,7 @@ const InterviewScheduleTable = ({ filter }: Props) => {
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="tenCty" header="Tên Cty" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="interviewSchedule" header="Thời gian" headerStyle={{ minWidth: '5rem' }} dataType="date" body={interviewTemplate} ></Column>
-                    <Column field="luongMongMuon" header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
@@ -228,11 +227,11 @@ const InterviewScheduleTable = ({ filter }: Props) => {
                     currentId={currentId}
                     onCloseModal={() => handleCancelInterviewSchedule()}
                 />
-                <SetPassInterview
+                {/* <SetPassInterview
                     visible={visiblePassInterview}
                     currentId={currentId}
                     onCloseModal={() => handleCancelPassInterview()}
-                />
+                /> */}
                 <ConfirmDialog />
             </div>
         </div>

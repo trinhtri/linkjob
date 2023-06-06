@@ -13,6 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
 import { CommonLookupRequest } from "../../services/commonLookup/dto/commonLookupRequest";
 import { commonLookupService } from "../../services/commonLookup/commonLookupService";
+import { InputNumber } from "primereact/inputnumber";
 
 interface Props {
     candidateId?: string,
@@ -33,7 +34,7 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
         gioiTinh: yup.string().required("Vui lòng chọn giới tính"),
         namSinh: yup.string().required("Vui lòng nhập năm sinh"),
         danhGiaNgonNgu: yup.string().required("Vui lòng nhập đánh giá ngôn ngữ"),
-        luongMongMuon: yup.string().required("Vui lòng nhập lương mong muốn"),
+        luongMongMuon: yup.number().required("Vui lòng nhập lương mong muốn"),
         nganh: yup.string().required("Vui lòng nhập ngành"),
         truong: yup.string().required("Vui lòng nhập trường"),
         kinhNghiem: yup.string().required("Vui lòng nhập kinh nghiệm"),
@@ -272,6 +273,18 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                             className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""
                                 }`}
                         />
+                        {/* <InputNumber id="luongMongMuon"
+                            value={getValues("luongMongMuon")}
+                            onValueChange={(e) => onInputNumberChange(e, 'price')}
+                            mode="currency"
+                            currency="USD"
+                            locale="en-US" /> */}
+
+                        {/* <InputNumber id="inputnumber"
+                            value={getValues("luongMongMuon") ?? null}
+                            className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""
+                                }`}
+                            onValueChange={(e: any) => setValue("luongMongMuon", e.target.value)}></InputNumber> */}
                         <small className="p-error">
                             {errors.luongMongMuon?.message?.toString()}
                         </small>
