@@ -30,7 +30,7 @@ const Candidates = () => {
     }
     const debouncedSearch = debounce(handleSearch, 600);
 
-    const { data: countForStatus, refetch: refetchCountForStatus } = useQuery(
+    const { data: countForStatus, refetch } = useQuery(
         ['CountForStatus'],
         () => { return candidateService.getCountForStatus(); },
     );
@@ -43,6 +43,9 @@ const Candidates = () => {
     const InterviewScheduleTable = dynamic(() => import('../../components/candidates/interviewScheduleTable'), {
         ssr: false
     });
+    const InterviewedTable = dynamic(() => import('../../components/candidates/interviewedTable'), {
+        ssr: false
+    });
     const PassedTableTable = dynamic(() => import('../../components/candidates/passedTable'), {
         ssr: false
     });
@@ -50,30 +53,40 @@ const Candidates = () => {
         ssr: false
     });
 
+    const onHandlerReloadCountStatus = () => {
+        console.log("nguyen hong");
+        refetch();
+    }
+
     const wizardItems = [
         {
             id: "0",
-            label: `Đang tìm việc (${countForStatus?.data.dangTimViec ?? 0})`,
-            component: <SearchJobTable filter={lazyState} />
+            label: `Đang tìm việc (${countForStatus?.data.searchJob ?? 0})`,
+            component: <SearchJobTable filter={lazyState} onReloadCountStatus={onHandlerReloadCountStatus} />
         },
         {
             id: "1",
-            label: `Đang ứng tuyển (${countForStatus?.data.dangUngTuyen ?? 0})`,
-            component: <ApplyingForJobsTable filter={lazyState} />
+            label: `Đang ứng tuyển (${countForStatus?.data.appling ?? 0})`,
+            component: <ApplyingForJobsTable filter={lazyState} onReloadCountStatus={onHandlerReloadCountStatus} />
         },
         {
             id: "2",
-            label: `Lịch phỏng vấn (${countForStatus?.data.lichPV ?? 0})`,
-            component: <InterviewScheduleTable filter={lazyState} />
+            label: `Lịch phỏng vấn (${countForStatus?.data.scheduleInterview ?? 0})`,
+            component: <InterviewScheduleTable filter={lazyState} onReloadCountStatus={onHandlerReloadCountStatus} />
         },
         {
             id: "3",
-            label: `Đã trúng tuyển (${countForStatus?.data.daTrungTuyen ?? 0})`,
-            component: <PassedTableTable filter={lazyState} />
+            label: `Đã phỏng vấn (${countForStatus?.data.interviewed ?? 0})`,
+            component: <InterviewedTable filter={lazyState} onReloadCountStatus={onHandlerReloadCountStatus} />
         },
         {
             id: "4",
-            label: `Đã hoàn thành (${countForStatus?.data.daHoanThanh ?? 0})`,
+            label: `Đã trúng tuyển (${countForStatus?.data.passed ?? 0})`,
+            component: <PassedTableTable filter={lazyState} onReloadCountStatus={onHandlerReloadCountStatus} />
+        },
+        {
+            id: "5",
+            label: `Đã hoàn thành (${countForStatus?.data.accepted ?? 0})`,
             component: <AcceptedTableTable filter={lazyState} />
         },
     ];
@@ -101,10 +114,6 @@ const Candidates = () => {
 
     const exportCSV = () => {
 
-    }
-
-    const onChangeV = (e: any) => {
-        setlazyState({ ...lazyState, languages: e.value })
     }
 
     return (

@@ -20,11 +20,13 @@ import { CandidateInterviewResponse } from '../../services/candidate/dto/candida
 import { formatCurrency } from '../../pages/utilities/formatCurrency';
 import SetInterviewSchedule from './setInterviewSchedule';
 import { SetPassInterviewRequest } from '../../services/candidate/dto/setPassInterviewRequest';
+import { SetInterviewedRequest } from '../../services/candidate/dto/setInterviewedRequest';
 interface Props {
     filter: SearchCandidateCommonRequest,
+    onReloadCountStatus: () => void;
 }
 
-const InterviewScheduleTable = ({ filter }: Props) => {
+const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
     const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
@@ -106,29 +108,29 @@ const InterviewScheduleTable = ({ filter }: Props) => {
         });
     };
 
-    const setPassInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setPassInterview(data));
-    const confirmPassInterview = (data: any) => {
-        confirmDialog({
-            message: 'Bạn có chắc chắn ứng viên đã đỗ phỏng vấn không?',
-            header: 'Xác nhận',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                const request = {
-                    candidateId: data.id,
-                    companyId: data.companyId
-                };
-                setPassInterviewMutation.mutate(request, {
-                    onSuccess: () => {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
-                    },
-                    onError: (error: any) => {
-                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
-                    }
-                });
-            },
-            acceptClassName: 'p-button-danger'
-        });
-    };
+    // const setPassInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setPassInterview(data));
+    // const confirmPassInterview = (data: any) => {
+    //     confirmDialog({
+    //         message: 'Bạn có chắc chắn ứng viên đã đỗ phỏng vấn không?',
+    //         header: 'Xác nhận',
+    //         icon: 'pi pi-exclamation-triangle',
+    //         accept: () => {
+    //             const request = {
+    //                 candidateId: data.id,
+    //                 companyId: data.companyId
+    //             };
+    //             setPassInterviewMutation.mutate(request, {
+    //                 onSuccess: () => {
+    //                     toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+    //                 },
+    //                 onError: (error: any) => {
+    //                     toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
+    //                 }
+    //             });
+    //         },
+    //         acceptClassName: 'p-button-danger'
+    //     });
+    // };
 
     const router = useRouter();
 
@@ -142,6 +144,7 @@ const InterviewScheduleTable = ({ filter }: Props) => {
     }
     const handleCancelChangeSendCV = () => {
         setVisibleSendCV(false);
+        onReloadCountStatus();
         refetch();
     };
 
@@ -163,6 +166,32 @@ const InterviewScheduleTable = ({ filter }: Props) => {
         return formatCurrency(rowData.luongMongMuon as number);
     };
 
+    const setInterviewedMutation = useMutation((data: SetInterviewedRequest) => candidateService.setInterviewed(data));
+    const confirmInterviewed = (data: any) => {
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên đã phỏng vấn không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                const request = {
+                    candidateId: data.id,
+                    companyId: data.companyId
+                };
+                setInterviewedMutation.mutate(request, {
+                    onSuccess: () => {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                        onReloadCountStatus();
+                        refetch();
+                    },
+                    onError: (error: any) => {
+                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
+
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -178,8 +207,8 @@ const InterviewScheduleTable = ({ filter }: Props) => {
                             command: () => onSendCV(rowData)
                         },
                         {
-                            label: 'Đã trúng tuyển',
-                            command: () => confirmPassInterview(rowData)
+                            label: 'Đã phỏng vấn',
+                            command: () => confirmInterviewed(rowData)
                         },
                         {
                             label: 'Chỉnh sửa',
@@ -203,7 +232,7 @@ const InterviewScheduleTable = ({ filter }: Props) => {
                 <DataTable
                     ref={dt}
                     value={data?.data?.items}
-                    dataKey="id"
+                    dataKey="companyCandidateId"
                     loading={isLoading}
                     className="datatable-responsive"
                     emptyMessage="No users found."

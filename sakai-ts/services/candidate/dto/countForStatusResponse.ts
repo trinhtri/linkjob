@@ -1,7 +1,8 @@
 export interface CountForStatusResponse {
-  dangTimViec: number;
-  dangUngTuyen: number;
-  lichPV: number;
-  daTrungTuyen: number;
-  daHoanThanh: number;
+  searchJob: number;
+  appling: number;
+  scheduleInterview: number;
+  interviewed: number;
+  passed: number;
+  accepted: number;
 }

@@ -20,10 +20,11 @@ import { formatCurrency } from '../../pages/utilities/formatCurrency';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
+    onReloadCountStatus: () => void;
 }
 
 // const SearchJobTable = () => {
-const SearchJobTable = ({ filter }: Props) => {
+const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
@@ -116,6 +117,7 @@ const SearchJobTable = ({ filter }: Props) => {
     }
     const handleCancelChangeSendCV = () => {
         setVisibleSendCV(false);
+        onReloadCountStatus();
         refetch();
     };
 

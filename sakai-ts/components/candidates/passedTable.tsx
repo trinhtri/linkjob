@@ -22,9 +22,10 @@ import { AcceptOfferRequest } from '../../services/candidate/dto/acceptOfferRequ
 
 interface Props {
     filter: SearchCandidateCommonRequest,
+    onReloadCountStatus: () => void;
 }
 
-const PassedTable = ({ filter }: Props) => {
+const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
     const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
@@ -123,6 +124,7 @@ const PassedTable = ({ filter }: Props) => {
                     onSuccess() {
                         toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
                         refetch();
+                        onReloadCountStatus();
                     }
                 });
             },
@@ -142,6 +144,7 @@ const PassedTable = ({ filter }: Props) => {
     }
     const handleCancelChangeSendCV = () => {
         setVisibleSendCV(false);
+        onReloadCountStatus();
         refetch();
     };
 
@@ -151,6 +154,7 @@ const PassedTable = ({ filter }: Props) => {
     }
     const handleCancelInterviewSchedule = () => {
         setVisibleSchedule(false);
+        onReloadCountStatus();
         refetch();
     };
 

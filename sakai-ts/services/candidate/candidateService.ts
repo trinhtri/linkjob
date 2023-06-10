@@ -3,10 +3,12 @@ import { ApiEndpoint } from "../api-endpoint";
 import { PaginatedList } from "../paginatedList";
 import { AcceptOfferRequest } from "./dto/acceptOfferRequest";
 import { CandidateInterviewResponse } from "./dto/candidateInterviewResponse";
+import { CandidateInterviewedResponse } from "./dto/candidateInterviewedResponse";
 import { CandidateResponse } from "./dto/candidateResponse";
 import { CountForStatusResponse } from "./dto/countForStatusResponse";
 import { SendCVRequest } from "./dto/sendCVRequest";
 import { SetInterviewScheduleRequest } from "./dto/setInterviewScheduleRequest";
+import { SetInterviewedRequest } from "./dto/setInterviewedRequest";
 import { SetPassInterviewRequest } from "./dto/setPassInterviewRequest";
 
 export const candidateService = {
@@ -35,6 +37,14 @@ export const candidateService = {
   getsPagingInterview: (params: any) => {
     return api.get<PaginatedList<CandidateInterviewResponse>>(
       `${ApiEndpoint.candidate}/candidates-interview`,
+      {
+        params: params,
+      }
+    );
+  },
+  getsPagingInterviewed: (params: any) => {
+    return api.get<PaginatedList<CandidateInterviewedResponse>>(
+      `${ApiEndpoint.candidate}/candidates-interviewed`,
       {
         params: params,
       }
@@ -74,6 +84,10 @@ export const candidateService = {
 
   setPassInterview: (body: SetPassInterviewRequest) => {
     return api.put(`${ApiEndpoint.candidate}/set-pass-interview`, body);
+  },
+
+  setInterviewed: (body: SetInterviewedRequest) => {
+    return api.put(`${ApiEndpoint.candidate}/set-interviewed`, body);
   },
 
   acceptOffer: (body: AcceptOfferRequest) => {

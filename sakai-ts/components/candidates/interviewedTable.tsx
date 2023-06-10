@@ -14,17 +14,18 @@ import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
-import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import moment from 'moment';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
-
+import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import SetInterviewSchedule from './setInterviewSchedule';
+import { SetPassInterviewRequest } from '../../services/candidate/dto/setPassInterviewRequest';
 interface Props {
     filter: SearchCandidateCommonRequest,
     onReloadCountStatus: () => void;
 }
 
-const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
+const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
     const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
@@ -39,7 +40,7 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         sortField: "UserName",
         sortOrder: null,
         filterSearch: null,
-        status: 1,
+        status: 0,
         startDate: null,
         endDate: null,
         languages: []
@@ -56,7 +57,7 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
     }, [filter]);
 
     const { data, isLoading, refetch } = useQuery(
-        ['getCandidateApplingForJobs', lazyState],
+        ['interviewedPaging', lazyState],
         () => {
             let sorting = "";
             if (!!lazyState.sortField) {
@@ -72,7 +73,7 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                 startDate: lazyState.startDate,
                 endDate: lazyState.endDate
             };
-            return candidateService.getsPagingAppling(param);
+            return candidateService.getsPagingInterviewed(param);
         },
         {
             enabled: !!lazyState,
@@ -106,16 +107,23 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         });
     };
 
-    const confirmAcceptOffer = (data: any) => {
+    const setPassInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setPassInterview(data));
+    const confirmPassInterview = (data: any) => {
         confirmDialog({
-            message: 'Bạn có chắc chắn ứng viên đã nhận Offer?',
+            message: 'Bạn có chắc chắn ứng viên đã đỗ phỏng vấn không?',
             header: 'Xác nhận',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                deleteUserMutation.mutate(data.userId, {
-                    onSuccess() {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
-                        refetch();
+                const request = {
+                    candidateId: data.id,
+                    companyId: data.companyId
+                };
+                setPassInterviewMutation.mutate(request, {
+                    onSuccess: () => {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                    },
+                    onError: (error: any) => {
+                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
                     }
                 });
             },
@@ -135,17 +143,25 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
     }
     const handleCancelChangeSendCV = () => {
         setVisibleSendCV(false);
-        onReloadCountStatus();
         refetch();
     };
 
-    const onSetInterviewSchedule = (data: any) => {
-        setCurrentId(data.id);
-        setVisibleSchedule(true);
-    }
     const handleCancelInterviewSchedule = () => {
         setVisibleSchedule(false);
         refetch();
+    };
+
+    const onSetPassInterview = (data: any) => {
+        setCurrentId(data.id);
+        setVisiblePassInterview(true);
+    }
+
+    const handleCancelPassInterview = () => {
+        setVisiblePassInterview(false);
+        refetch();
+    };
+    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
+        return formatCurrency(rowData.luongMongMuon as number);
     };
 
     const actionBodyTemplate = (rowData: CandidateResponse) => {
@@ -163,15 +179,15 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                             command: () => onSendCV(rowData)
                         },
                         {
-                            label: 'Đặt lịch phỏng vấn',
-                            command: () => onSetInterviewSchedule(rowData)
+                            label: 'Đã trúng tuyển',
+                            command: () => confirmPassInterview(rowData)
                         },
                         {
                             label: 'Chỉnh sửa',
                             command: () => onEdit(rowData)
                         },
                         {
-                            label: 'Xóa',
+                            label: 'Delete',
                             command: () => confirmDelete(rowData)
                         }
                     ]}
@@ -179,9 +195,9 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
             </>
         );
     };
-    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
-        return formatCurrency(rowData.luongMongMuon as number);
-    };
+    const interviewTemplate = (rowData: CandidateInterviewResponse) => {
+        return moment(rowData.interviewSchedule).format('DD/MM/YYYY HH:mm');
+    }
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -196,7 +212,8 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="tenCty" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="tenCty" header="Tên Cty" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="interviewSchedule" header="Thời gian" headerStyle={{ minWidth: '5rem' }} dataType="date" body={interviewTemplate} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
@@ -211,9 +228,14 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     currentId={currentId}
                     onCloseModal={() => handleCancelInterviewSchedule()}
                 />
+                {/* <SetPassInterview
+                    visible={visiblePassInterview}
+                    currentId={currentId}
+                    onCloseModal={() => handleCancelPassInterview()}
+                /> */}
                 <ConfirmDialog />
             </div>
         </div>
     );
 };
-export default ApplyingForJobsTable;
+export default InterviewedTable;

@@ -9,7 +9,6 @@ import { Toast } from 'primereact/toast';
 import { candidateService } from '../../services/candidate/candidateService';
 import { commonLookupService } from '../../services/commonLookup/commonLookupService';
 import { CommonLookupRequest } from '../../services/commonLookup/dto/commonLookupRequest';
-import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
 import { Calendar } from 'primereact/calendar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
@@ -26,7 +25,8 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
         ["Companies"],
         () => {
             let param = {
-                type: "Company"
+                type: "Company",
+                parentId: currentId
             } as CommonLookupRequest;
             return commonLookupService.getLookup(param);
         },
