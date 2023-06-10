@@ -79,15 +79,15 @@ export const candidateService = {
   },
 
   setInterviewSchedule: (body: SetInterviewScheduleRequest) => {
-    return api.put(`${ApiEndpoint.candidate}/set-interview-schedule`, body);
+    return api.put(`${ApiEndpoint.candidate}/interview-schedule`, body);
   },
 
   setPassInterview: (body: SetPassInterviewRequest) => {
-    return api.put(`${ApiEndpoint.candidate}/set-pass-interview`, body);
+    return api.put(`${ApiEndpoint.candidate}/pass-interview`, body);
   },
 
   setInterviewed: (body: SetInterviewedRequest) => {
-    return api.put(`${ApiEndpoint.candidate}/set-interviewed`, body);
+    return api.put(`${ApiEndpoint.candidate}/interviewed`, body);
   },
 
   acceptOffer: (body: AcceptOfferRequest) => {
