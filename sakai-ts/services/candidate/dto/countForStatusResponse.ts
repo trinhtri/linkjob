@@ -1,6 +1,6 @@
 export interface CountForStatusResponse {
   dangTimViec: number;
-  dangHoTro: number;
+  dangUngTuyen: number;
   lichPV: number;
   daTrungTuyen: number;
   daHoanThanh: number;

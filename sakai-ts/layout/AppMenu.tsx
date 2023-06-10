@@ -15,12 +15,16 @@ const AppMenu = () => {
             label: 'Home',
             items: [
                 { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                { label: 'Candidates', icon: 'pi pi-fw pi-users', to: '/candidates' }
+                { label: 'Ứng viên', icon: 'pi pi-fw pi-users', to: '/candidates' }
             ]
         },
         {
             label: 'Admin',
-            items: [{ label: 'Users', icon: 'pi pi-fw pi-home', to: '/users' }]
+            items: [
+                { label: 'Người dùng', icon: 'pi pi-fw pi-home', to: '/users' },
+                { label: 'Ngôn ngữ', icon: 'pi pi-fw pi-home', to: '/languages' },
+                { label: 'Công ty', icon: 'pi pi-fw pi-home', to: '/companies' },
+            ]
         },
         {
             label: 'UI Components',

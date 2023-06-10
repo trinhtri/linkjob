@@ -17,15 +17,16 @@ import SendCV from './sendCV';
 import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
 import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
 }
 
-// const SearchJobTable = () => {
-const SearchJobTable = ({ filter }: Props) => {
+const AcceptedTable = ({ filter }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
+    const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [currentId, setCurrentId] = useState<string>("");
@@ -37,7 +38,7 @@ const SearchJobTable = ({ filter }: Props) => {
         sortField: "UserName",
         sortOrder: null,
         filterSearch: null,
-        status: 0,
+        status: 1,
         startDate: null,
         endDate: null,
         languages: []
@@ -54,7 +55,7 @@ const SearchJobTable = ({ filter }: Props) => {
     }, [filter]);
 
     const { data, isLoading, refetch } = useQuery(
-        ['searchJobQuery', lazyState],
+        ['getCandidateAccepted', lazyState],
         () => {
             let sorting = "";
             if (!!lazyState.sortField) {
@@ -70,7 +71,7 @@ const SearchJobTable = ({ filter }: Props) => {
                 startDate: lazyState.startDate,
                 endDate: lazyState.endDate
             };
-            return candidateService.getsPaging(param);
+            return candidateService.getsPagingAccepted(param);
         },
         {
             enabled: !!lazyState,
@@ -104,33 +105,39 @@ const SearchJobTable = ({ filter }: Props) => {
         });
     };
 
+    const confirmAcceptOffer = (data: any) => {
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên đã nhận Offer?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                deleteUserMutation.mutate(data.userId, {
+                    onSuccess() {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
+                        refetch();
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
+
     const router = useRouter();
 
     const onEdit = (data: any) => {
         router.push(`/candidates/${data.id}`);
     }
 
-    const onSendCV = (data: any) => {
-        setCurrentId(data.id);
-        setVisibleSendCV(true);
-    }
     const handleCancelChangeSendCV = () => {
         setVisibleSendCV(false);
         refetch();
     };
 
-    const onSetInterviewSchedule = (data: any) => {
-        setCurrentId(data.id);
-        setVisibleSchedule(true);
-    }
     const handleCancelInterviewSchedule = () => {
         setVisibleSchedule(false);
         refetch();
     };
 
-    const salaryBodyTemplate = (rowData: any) => {
-        return formatCurrency(rowData.luongMongMuon as number);
-    };
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -142,15 +149,11 @@ const SearchJobTable = ({ filter }: Props) => {
                     popup
                     model={[
                         {
-                            label: 'Gửi CV',
-                            command: () => onSendCV(rowData)
-                        },
-                        {
                             label: 'Chỉnh sửa',
                             command: () => onEdit(rowData)
                         },
                         {
-                            label: 'Delete',
+                            label: 'Xóa',
                             command: () => confirmDelete(rowData)
                         }
                     ]}
@@ -158,7 +161,9 @@ const SearchJobTable = ({ filter }: Props) => {
             </>
         );
     };
-
+    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
+        return formatCurrency(rowData.luongMongMuon as number);
+    };
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -173,12 +178,7 @@ const SearchJobTable = ({ filter }: Props) => {
                     <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="gioiTinh" header="Giới tính" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="truong" header="Trường" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="nganh" header="Chuyên nghành" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="tenCty" header="Cty nhận" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
@@ -198,4 +198,4 @@ const SearchJobTable = ({ filter }: Props) => {
         </div>
     );
 };
-export default SearchJobTable;
+export default AcceptedTable;

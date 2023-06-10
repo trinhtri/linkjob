@@ -30,6 +30,9 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
             } as CommonLookupRequest;
             return commonLookupService.getLookup(param);
         },
+        {
+            enabled: visible && !!currentId
+        }
     );
 
     const validationSchema = yup.object().shape({

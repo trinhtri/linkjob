@@ -5,4 +5,6 @@ export const ApiEndpoint = {
   candidate: "candidates",
   commonLookup: "common-lookup",
   role: "roles",
+  language: "languages",
+  company: "companies",
 };

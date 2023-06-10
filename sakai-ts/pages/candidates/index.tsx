@@ -43,32 +43,38 @@ const Candidates = () => {
     const InterviewScheduleTable = dynamic(() => import('../../components/candidates/interviewScheduleTable'), {
         ssr: false
     });
+    const PassedTableTable = dynamic(() => import('../../components/candidates/passedTable'), {
+        ssr: false
+    });
+    const AcceptedTableTable = dynamic(() => import('../../components/candidates/acceptedTable'), {
+        ssr: false
+    });
 
     const wizardItems = [
         {
             id: "0",
-            label: `Đang tìm việc (${countForStatus?.data.dangTimViec})`,
+            label: `Đang tìm việc (${countForStatus?.data.dangTimViec ?? 0})`,
             component: <SearchJobTable filter={lazyState} />
         },
         {
             id: "1",
-            label: `Đang ứng tuyển (${countForStatus?.data.dangHoTro})`,
+            label: `Đang ứng tuyển (${countForStatus?.data.dangUngTuyen ?? 0})`,
             component: <ApplyingForJobsTable filter={lazyState} />
         },
         {
             id: "2",
-            label: `Lịch phỏng vấn (${countForStatus?.data.lichPV})`,
+            label: `Lịch phỏng vấn (${countForStatus?.data.lichPV ?? 0})`,
             component: <InterviewScheduleTable filter={lazyState} />
         },
         {
             id: "3",
-            label: `Đã trúng tuyển (${countForStatus?.data.daTrungTuyen})`,
-            component: <InterviewScheduleTable filter={lazyState} />
+            label: `Đã trúng tuyển (${countForStatus?.data.daTrungTuyen ?? 0})`,
+            component: <PassedTableTable filter={lazyState} />
         },
         {
             id: "4",
-            label: `Đã hoàn thành (${countForStatus?.data.daHoanThanh})`,
-            component: <InterviewScheduleTable filter={lazyState} />
+            label: `Đã hoàn thành (${countForStatus?.data.daHoanThanh ?? 0})`,
+            component: <AcceptedTableTable filter={lazyState} />
         },
     ];
 
@@ -98,7 +104,6 @@ const Candidates = () => {
     }
 
     const onChangeV = (e: any) => {
-        console.log("onChangeV", e);
         setlazyState({ ...lazyState, languages: e.value })
     }
 
@@ -125,15 +130,14 @@ const Candidates = () => {
                         <div className="col-3">
                             <MultiSelect
                                 inputId="multiselect"
-                                // value={lazyState.languages}
+                                value={lazyState.languages}
                                 optionValue="value"
                                 optionLabel="label"
                                 placeholder="Chọn ngôn ngữ"
                                 className={`form-control w-full `}
                                 options={languages?.data}
                                 onChange={(e) =>
-                                    onChangeV(e)
-                                    // setlazyState({ ...lazyState, languages: e.value })
+                                    setlazyState({ ...lazyState, languages: e.value })
                                 }
                             />
                         </div>

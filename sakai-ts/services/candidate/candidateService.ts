@@ -48,6 +48,22 @@ export const candidateService = {
       }
     );
   },
+  getsPagingPassed: (params: any) => {
+    return api.get<PaginatedList<CandidateInterviewResponse>>(
+      `${ApiEndpoint.candidate}/candidates-passed`,
+      {
+        params: params,
+      }
+    );
+  },
+  getsPagingAccepted: (params: any) => {
+    return api.get<PaginatedList<CandidateInterviewResponse>>(
+      `${ApiEndpoint.candidate}/candidates-accepted`,
+      {
+        params: params,
+      }
+    );
+  },
   sendCV: (body: SendCVRequest) => {
     return api.put(`${ApiEndpoint.candidate}/send-cv`, body);
   },

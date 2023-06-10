@@ -40,6 +40,9 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
             } as CommonLookupRequest;
             return commonLookupService.getLookup(param);
         },
+        {
+            enabled: !!visible
+        }
     );
 
     const { data: companiesSelected } = useQuery(
