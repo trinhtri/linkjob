@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 const EditCandidate = () => {
     const router = useRouter();
     const { id } = router.query;
-    console.log("id", id)
     return (
         <>
             <div className="col-12">

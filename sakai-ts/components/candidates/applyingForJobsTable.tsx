@@ -88,41 +88,6 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         })
     }
 
-    const deleteUserMutation = useMutation((userId) => userService.delete(userId));
-    const confirmDelete = (data: any) => {
-        confirmDialog({
-            message: 'Are you sure you want to delete user?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                deleteUserMutation.mutate(data.userId, {
-                    onSuccess() {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
-                        refetch();
-                    }
-                });
-            },
-            acceptClassName: 'p-button-danger'
-        });
-    };
-
-    const confirmAcceptOffer = (data: any) => {
-        confirmDialog({
-            message: 'Bạn có chắc chắn ứng viên đã nhận Offer?',
-            header: 'Xác nhận',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                deleteUserMutation.mutate(data.userId, {
-                    onSuccess() {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
-                        refetch();
-                    }
-                });
-            },
-            acceptClassName: 'p-button-danger'
-        });
-    };
-
     const router = useRouter();
 
     const onEdit = (data: any) => {
@@ -145,6 +110,7 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
     }
     const handleCancelInterviewSchedule = () => {
         setVisibleSchedule(false);
+        onReloadCountStatus();
         refetch();
     };
 
@@ -169,10 +135,6 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                         {
                             label: 'Chỉnh sửa',
                             command: () => onEdit(rowData)
-                        },
-                        {
-                            label: 'Xóa',
-                            command: () => confirmDelete(rowData)
                         }
                     ]}
                 />

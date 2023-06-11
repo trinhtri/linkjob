@@ -89,24 +89,6 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
         })
     }
 
-    const deleteUserMutation = useMutation((userId) => userService.delete(userId));
-    const confirmDelete = (data: any) => {
-        confirmDialog({
-            message: 'Are you sure you want to delete user?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                deleteUserMutation.mutate(data.userId, {
-                    onSuccess() {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
-                        refetch();
-                    }
-                });
-            },
-            acceptClassName: 'p-button-danger'
-        });
-    };
-
     const setPassInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setPassInterview(data));
     const confirmPassInterview = (data: any) => {
         confirmDialog({
@@ -121,6 +103,8 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
                 setPassInterviewMutation.mutate(request, {
                     onSuccess: () => {
                         toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                        onReloadCountStatus();
+                        refetch();
                     },
                     onError: (error: any) => {
                         toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
@@ -131,11 +115,31 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
         });
     };
 
-    const router = useRouter();
-
-    const onEdit = (data: any) => {
-        router.push(`/candidates/${data.id}`);
-    }
+    const setFaildInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setFaildInterview(data));
+    const confirmFaildInterview = (data: any) => {
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên đã trượt phỏng vấn không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                const request = {
+                    candidateId: data.id,
+                    companyId: data.companyId
+                };
+                setFaildInterviewMutation.mutate(request, {
+                    onSuccess: () => {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                        onReloadCountStatus();
+                        refetch();
+                    },
+                    onError: (error: any) => {
+                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
 
     const onSendCV = (data: any) => {
         setCurrentId(data.id);
@@ -183,13 +187,9 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
                             command: () => confirmPassInterview(rowData)
                         },
                         {
-                            label: 'Chỉnh sửa',
-                            command: () => onEdit(rowData)
+                            label: 'Trượt PV',
+                            command: () => confirmFaildInterview(rowData)
                         },
-                        {
-                            label: 'Delete',
-                            command: () => confirmDelete(rowData)
-                        }
                     ]}
                 />
             </>

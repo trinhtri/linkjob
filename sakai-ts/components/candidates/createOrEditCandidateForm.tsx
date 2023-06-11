@@ -1,5 +1,5 @@
 import { InputText } from "primereact/inputtext";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "primereact/button";
 import * as yup from "yup";
@@ -14,6 +14,10 @@ import { MultiSelect } from "primereact/multiselect";
 import { CommonLookupRequest } from "../../services/commonLookup/dto/commonLookupRequest";
 import { commonLookupService } from "../../services/commonLookup/commonLookupService";
 import { InputNumber } from "primereact/inputnumber";
+import { FileUpload } from "primereact/fileupload";
+import axios from "axios";
+import { config } from "process";
+import getConfig from "next/config";
 
 interface Props {
     candidateId?: string,
@@ -90,7 +94,6 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
             setValue('namSinh', candidateDetail.data.namSinh);
             setValue('facebook', candidateDetail.data.facebook);
             setValue('danhGiaNgonNgu', candidateDetail.data.danhGiaNgonNgu);
-            setValue('luongMongMuon', candidateDetail.data.luongMongMuon);
             setValue('nganh', candidateDetail.data.nganh);
             setValue('truong', candidateDetail.data.truong);
             setValue('kinhNghiem', candidateDetail.data.kinhNghiem);
@@ -98,6 +101,8 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
             setValue('choOHienTai', candidateDetail.data.choOHienTai);
             setValue('nguyenVong', candidateDetail.data.nguyenVong);
             setValue('ngonNgu', candidateDetail.data.ngonNgu ?? null);
+            setValue('luongMongMuon', candidateDetail.data.luongMongMuon);
+            console.log("lương", candidateDetail.data.luongMongMuon ?? 0);
         }
     }, [candidateDetail, setValue]);
 
@@ -166,11 +171,48 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
         { label: "Khác", value: "Khác" },
     ];
 
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const onFileSelect = (event: any) => {
+        console.log("event", event);
+        setSelectedFile(event.files[0]);
+    };
+
+    const [file, setFile] = useState();
+    const saveFile = (event: any) => {
+        setFile(event.target.files[0]);
+    }
+    const { publicRuntimeConfig } = getConfig();
+    const onUpload = () => {
+        const formData = new FormData();
+        if (file) {
+            formData.append('file', file);
+        }
+        const apiUpload = `${publicRuntimeConfig.apiUrl}/files`
+        axios
+            .post(apiUpload, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            })
+            .then((response) => {
+                console.log("response", response.data);
+                setValue("cvUrl", response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
     return (
         <>
             <Toast ref={toast} />
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="p-fluid formgrid grid">
+                    <div className="field col-12">
+                        <input type="file" name="demo" id="demo" onChange={saveFile} />
+                        <button onClick={onUpload}>Upload</button>
+                    </div>
+
                     <div className="field col-12 md:col-6">
                         <label htmlFor="name">Họ và tên *</label>
                         <InputText
@@ -267,24 +309,11 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="luongMongMuon">Lương mong muốn *</label>
-                        <InputText
-                            id="luongMongMuon"
-                            {...register("luongMongMuon")}
-                            className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""
-                                }`}
-                        />
-                        {/* <InputNumber id="luongMongMuon"
+                        <InputNumber
                             value={getValues("luongMongMuon")}
-                            onValueChange={(e) => onInputNumberChange(e, 'price')}
-                            mode="currency"
-                            currency="USD"
-                            locale="en-US" /> */}
-
-                        {/* <InputNumber id="inputnumber"
-                            value={getValues("luongMongMuon") ?? null}
-                            className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""
-                                }`}
-                            onValueChange={(e: any) => setValue("luongMongMuon", e.target.value)}></InputNumber> */}
+                            onValueChange={(e) => setValue('luongMongMuon', e.value ?? 0)}
+                            className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""}`}
+                        />
                         <small className="p-error">
                             {errors.luongMongMuon?.message?.toString()}
                         </small>

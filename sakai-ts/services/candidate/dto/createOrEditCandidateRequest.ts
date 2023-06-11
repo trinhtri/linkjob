@@ -8,7 +8,7 @@ export interface CreateOrEditCandidateRequest {
   namSinh: string;
   facebook: string;
   danhGiaNgonNgu: string;
-  luongMongMuon: string;
+  luongMongMuon: number;
   nganh: string;
   truong: string;
   kinhNghiem: string;

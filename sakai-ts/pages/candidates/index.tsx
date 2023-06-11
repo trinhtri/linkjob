@@ -124,7 +124,7 @@ const Candidates = () => {
                         <h5 className="mt-0">Quản lý ứng viên</h5>
 
                         <div>
-                            <Button label="Export" icon="pi pi-upload" className="p-button-help mr-2 p-button-sm" onClick={exportCSV} />
+                            {/* <Button label="Export" icon="pi pi-upload" className="p-button-help mr-2 p-button-sm" onClick={exportCSV} /> */}
                             <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success mr-2 p-button-sm" onClick={onCreate} />
                         </div>
                     </div>

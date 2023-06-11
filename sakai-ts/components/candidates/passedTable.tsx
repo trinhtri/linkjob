@@ -132,6 +132,30 @@ const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
         });
     };
 
+    const rejectOfferMutation = useMutation((request: AcceptOfferRequest) => candidateService.rejectOffer(request));
+    const confirmRejectOffer = (data: any) => {
+        console.log("data", data);
+        let request = {
+            candidateId: data.id,
+            companyId: data.companyId
+        } as AcceptOfferRequest;
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên từ chối Offer?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                rejectOfferMutation.mutate(request, {
+                    onSuccess() {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Ứng viên từ chối offer thành công', life: 3000 });
+                        refetch();
+                        onReloadCountStatus();
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
+
     const router = useRouter();
 
     const onEdit = (data: any) => {
@@ -171,6 +195,10 @@ const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
                         {
                             label: 'Nhận offer',
                             command: () => confirmAcceptOffer(rowData)
+                        },
+                        {
+                            label: 'Từ chối offer',
+                            command: () => confirmRejectOffer(rowData)
                         },
                         {
                             label: 'Chỉnh sửa',

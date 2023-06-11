@@ -192,6 +192,32 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
         });
     };
 
+    const setRejectCVMutation = useMutation((data: SetInterviewedRequest) => candidateService.setRejectInterview(data));
+    const confirmRejectCV = (data: any) => {
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên đã phỏng vấn không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                const request = {
+                    candidateId: data.id,
+                    companyId: data.companyId
+                };
+                setRejectCVMutation.mutate(request, {
+                    onSuccess: () => {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                        onReloadCountStatus();
+                        refetch();
+                    },
+                    onError: (error: any) => {
+                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
+
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -209,6 +235,10 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                         {
                             label: 'Đã phỏng vấn',
                             command: () => confirmInterviewed(rowData)
+                        },
+                        {
+                            label: 'Cty từ chối',
+                            command: () => confirmRejectCV(rowData)
                         },
                         {
                             label: 'Chỉnh sửa',

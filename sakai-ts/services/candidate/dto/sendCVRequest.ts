@@ -1,4 +1,4 @@
 export interface SendCVRequest {
   id: string;
-  ctyNhan: string[];
+  companies: string[];
 }

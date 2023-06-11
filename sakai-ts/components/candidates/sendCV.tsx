@@ -29,39 +29,21 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
             selected.splice(selected.indexOf(e.value), 1);
 
         setSelectedItems(selected);
-
-        setValue("ctyNhan", selected);
+        setValue("companies", selected);
     }
     const { data: companies } = useQuery(
-        ["Company"],
+        ["CompanyUnSendCV"],
         () => {
             let param = {
-                type: "Company"
+                type: "CompanyUnSendCV",
+                parentId: currentId
             } as CommonLookupRequest;
             return commonLookupService.getLookup(param);
         },
         {
-            enabled: !!visible
+            enabled: !!visible && !!currentId
         }
     );
-
-    const { data: companiesSelected } = useQuery(
-        ["CompaniesByCandidateId", visible],
-        () => {
-            return candidateService.getCompaniesByCandidateId(currentId);
-        },
-        {
-            enabled: !!currentId && visible
-        }
-    );
-
-    useEffect(() => {
-        if (companiesSelected?.data) {
-            setSelectedItems(companiesSelected.data)
-        } else {
-            setSelectedItems([]);
-        }
-    }, [companiesSelected]);
 
     const validationSchema = yup.object().shape({
         ctyNhan: yup.array().min(1, "Vui lòng chọn cty"),
@@ -116,13 +98,15 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
                 <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl ">
                     <div className="field">
                         <label htmlFor="password">Vui lòng chọn công ty</label>
-                        <div className="col-12 md:col-4">
-                            {companies?.data.map((item) => (
+                        <div className="col-12">
+                            {companies?.data.length != null && companies?.data.length > 0 ? companies?.data.map((item) => (
                                 <div key={item.label} className="col-12" >
-                                    <Checkbox inputId={item.label} {...register("ctyNhan")} value={item.value} onChange={handleCheckboxChange} checked={selectedItems.includes(item.value)} />
+                                    <Checkbox inputId={item.label} {...register("companies")} value={item.value} onChange={handleCheckboxChange} checked={selectedItems.includes(item.value)} />
                                     <label htmlFor={item.label} className='ml-3'>{item.label}</label>
                                 </div>
-                            ))}
+                            )) : (<>
+                                <h3>Bạn đã gửi ứng viên này cho mọi công ty rồi!</h3>
+                            </>)}
                         </div>
                     </div>
                 </form>
