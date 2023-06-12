@@ -1,6 +1,6 @@
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,6 +13,7 @@ import { Calendar } from 'primereact/calendar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { SetInterviewScheduleRequest } from '../../services/candidate/dto/setInterviewScheduleRequest';
+import moment from 'moment';
 interface Props {
     visible: boolean;
     currentId: string;
@@ -82,6 +83,8 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
             <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit(onSubmit)} loading={setInterviewScheduleMutation.isLoading} />
         </>
     );
+
+    const [timeInterview, setTimeInterview] = useState(moment.now);
     return (
         <>
             <Toast ref={toast} />
@@ -110,19 +113,33 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
                     <div className="field">
                         <label htmlFor="schedule">Ngày phỏng vấn</label>
                         <Calendar dateFormat="dd/mm/yy"
+                            id='NgayPV'
                             value={getValues("interviewSchedule")}
                             {...register("interviewSchedule")}
                             onChange={(e: any) =>
                                 setValue("interviewSchedule", e.value)
                             }
-                            showTime hourFormat="24"></Calendar>
+                        ></Calendar>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="schedule">Giờ phỏng vấn</label>
+                        <Calendar
+                            timeOnly
+                            showTime
+                            hourFormat="12"
+                            id='GioPV'
+                            value={timeInterview}
+                            onChange={(e: any) =>
+                                setTimeInterview(e.value)}
+                        >
+                        </Calendar>
                     </div>
                     <div className="field">
                         <label htmlFor="schedule">Ghi chú</label>
                         <InputTextarea autoResize rows={3} cols={30}   {...register("note")} />
                     </div>
                 </form>
-            </Dialog>
+            </Dialog >
         </>
     );
 

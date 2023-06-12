@@ -90,7 +90,7 @@ export const candidateService = {
     return api.put(`${ApiEndpoint.candidate}/interviewed`, body);
   },
   setRejectInterview: (body: SetInterviewedRequest) => {
-    return api.put(`${ApiEndpoint.candidate}/reject-interview`, body);
+    return api.put(`${ApiEndpoint.candidate}/reject-cv`, body);
   },
   setFaildInterview: (body: SetInterviewedRequest) => {
     return api.put(`${ApiEndpoint.candidate}/faild-interview`, body);

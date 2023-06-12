@@ -1,21 +1,21 @@
 export interface CreateOrEditCandidateRequest {
   id: string;
-  hoTen: string;
-  sdt: string;
+  fullName: string;
+  phoneNumber: string;
   email: string;
-  bangCap: string;
-  gioiTinh: string;
-  namSinh: string;
-  facebook: string;
-  danhGiaNgonNgu: string;
-  luongMongMuon: number;
-  nganh: string;
-  truong: string;
-  kinhNghiem: string;
-  queQuan: string;
-  choOHienTai: string;
-  nguyenVong: string;
-  ngonNgu: string[];
+  degree: string;
+  gender: string;
+  dateOfBirth: string;
+  faceBook: string;
+  levelAssessment: string;
+  salary: number;
+  major: string;
+  school: string;
+  experience: string;
+  homeTown: string;
+  address: string;
+  wish: string;
+  languages: string[];
   cvName: string;
   cvUrl: string;
 }

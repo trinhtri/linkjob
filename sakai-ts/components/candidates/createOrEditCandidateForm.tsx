@@ -32,22 +32,22 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
             .string()
             .required("Vui lòng nhập email")
             .email("Email is invalid"),
-        hoTen: yup.string().required("Vui lòng nhập họ và tên"),
-        sdt: yup.string().required("Vui lòng nhập số điện thoại"),
-        bangCap: yup.string().required("Vui lòng nhập bằng cấp"),
-        gioiTinh: yup.string().required("Vui lòng chọn giới tính"),
-        namSinh: yup.string().required("Vui lòng nhập năm sinh"),
-        danhGiaNgonNgu: yup.string().required("Vui lòng nhập đánh giá ngôn ngữ"),
-        luongMongMuon: yup.number().required("Vui lòng nhập lương mong muốn"),
-        nganh: yup.string().required("Vui lòng nhập ngành"),
-        truong: yup.string().required("Vui lòng nhập trường"),
-        kinhNghiem: yup.string().required("Vui lòng nhập kinh nghiệm"),
-        choOHienTai: yup.string().required("Vui lòng nhập chỗ ở hiện tại"),
-        nguyenVong: yup.string().required("Vui lòng nhập nguyện vọng"),
-        ngonNgu: yup.array().min(1, "Vui lòng nhập ngôn ngữ"),
+        fullName: yup.string().required("Vui lòng nhập họ và tên"),
+        phoneNumber: yup.string().required("Vui lòng nhập số điện thoại"),
+        degree: yup.string().required("Vui lòng nhập bằng cấp"),
+        gender: yup.string().required("Vui lòng chọn giới tính"),
+        dateOfBirth: yup.string().required("Vui lòng nhập năm sinh"),
+        // levelAssessment: yup.string().required("Vui lòng nhập đánh giá ngôn ngữ"),
+        salary: yup.number().required("Vui lòng nhập lương mong muốn"),
+        major: yup.string().required("Vui lòng nhập ngành"),
+        school: yup.string().required("Vui lòng nhập trường"),
+        experience: yup.string().required("Vui lòng nhập kinh nghiệm"),
+        address: yup.string().required("Vui lòng nhập chỗ ở hiện tại"),
+        wish: yup.string().required("Vui lòng nhập nguyện vọng"),
+        languages: yup.array().min(1, "Vui lòng nhập ngôn ngữ"),
     });
 
-    const { data: candidateDetail } = useQuery(
+    const { data: candidateDetail, isLoading } = useQuery(
         ["GetCandidateById", candidateId],
         () => {
             return candidateService.getById(candidateId);
@@ -79,30 +79,35 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
         mode: "onBlur",
         resolver: yupResolver(validationSchema),
         defaultValues: {
-            gioiTinh: "Nam",
+            gender: "Nam",
         },
     });
 
     useEffect(() => {
         if (candidateDetail) {
             setValue('id', candidateDetail.data.id);
-            setValue('hoTen', candidateDetail.data.hoTen);
-            setValue('sdt', candidateDetail.data.sdt);
+            setValue('fullName', candidateDetail.data.fullName);
+            setValue('phoneNumber', candidateDetail.data.phoneNumber);
             setValue('email', candidateDetail.data.email);
-            setValue('bangCap', candidateDetail.data.bangCap);
-            setValue('gioiTinh', candidateDetail.data.gioiTinh);
-            setValue('namSinh', candidateDetail.data.namSinh);
-            setValue('facebook', candidateDetail.data.facebook);
-            setValue('danhGiaNgonNgu', candidateDetail.data.danhGiaNgonNgu);
-            setValue('nganh', candidateDetail.data.nganh);
-            setValue('truong', candidateDetail.data.truong);
-            setValue('kinhNghiem', candidateDetail.data.kinhNghiem);
-            setValue('queQuan', candidateDetail.data.queQuan);
-            setValue('choOHienTai', candidateDetail.data.choOHienTai);
-            setValue('nguyenVong', candidateDetail.data.nguyenVong);
-            setValue('ngonNgu', candidateDetail.data.ngonNgu ?? null);
-            setValue('luongMongMuon', candidateDetail.data.luongMongMuon);
-            console.log("lương", candidateDetail.data.luongMongMuon ?? 0);
+            setValue('degree', candidateDetail.data.degree);
+            setValue('gender', candidateDetail.data.gender);
+            setValue('dateOfBirth', candidateDetail.data.dateOfBirth);
+            setValue('faceBook', candidateDetail.data.faceBook);
+            setValue('levelAssessment', candidateDetail.data.levelAssessment);
+            setValue('major', candidateDetail.data.major);
+            setValue('school', candidateDetail.data.school);
+            setValue('experience', candidateDetail.data.experience);
+            setValue('homeTown', candidateDetail.data.homeTown);
+            setValue('address', candidateDetail.data.address);
+            setValue('wish', candidateDetail.data.wish);
+            setValue('languages', candidateDetail.data.languages ?? null);
+            setValue('salary', candidateDetail.data.salary);
+            setValue('cvName', candidateDetail.data.cvName);
+            setValue('cvUrl', candidateDetail.data.cvUrl);
+            setIsLoadingFile(true);
+            setTimeout(() => {
+                setIsLoadingFile(false);
+            }, 50);
         }
     }, [candidateDetail, setValue]);
 
@@ -171,46 +176,50 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
         { label: "Khác", value: "Khác" },
     ];
 
-    const [selectedFile, setSelectedFile] = useState(null);
-
-    const onFileSelect = (event: any) => {
-        console.log("event", event);
-        setSelectedFile(event.files[0]);
-    };
-
-    const [file, setFile] = useState();
-    const saveFile = (event: any) => {
-        setFile(event.target.files[0]);
-    }
     const { publicRuntimeConfig } = getConfig();
-    const onUpload = () => {
-        const formData = new FormData();
-        if (file) {
-            formData.append('file', file);
+    const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false);
+    const onUpload = (event: any) => {
+        if (event.target && event.target.files[0]) {
+            setIsLoadingFile(true);
+            const formData = new FormData();
+            formData.append('file', event.target.files[0]);
+            const apiUpload = `${publicRuntimeConfig.apiUrl}/files`;
+            setValue("cvName", event.target.files[0].name);
+            axios
+                .post(apiUpload, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                })
+                .then((response) => {
+                    console.log("demo", response.data)
+                    setValue("cvUrl", response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => setIsLoadingFile(false));
         }
-        const apiUpload = `${publicRuntimeConfig.apiUrl}/files`
-        axios
-            .post(apiUpload, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            })
-            .then((response) => {
-                console.log("response", response.data);
-                setValue("cvUrl", response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
     }
     return (
         <>
             <Toast ref={toast} />
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="p-fluid formgrid grid">
-                    <div className="field col-12">
-                        <input type="file" name="demo" id="demo" onChange={saveFile} />
-                        <button onClick={onUpload}>Upload</button>
+                    <div className="field col-12 mb-6">
+                        <div className="max-w-xl">
+                            <div id="form-file-upload">
+                                <input type="file" id="input-file-upload" multiple={false} onChange={onUpload} />
+                                <label id="label-file-upload" htmlFor="input-file-upload">
+                                    <div>
+                                        <p>Drag and drop your file CV here</p>
+                                    </div>
+                                </label>
+                                <div className="field col-12 text-base mt-2 font-medium	">
+                                    <span>Tên file: {isLoadingFile == false && getValues('cvName')}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="field col-12 md:col-6">
@@ -218,24 +227,23 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                         <InputText
                             id="name"
                             required
-                            autoFocus
-                            {...register("hoTen")}
-                            className={`form-control ${errors.hoTen ? "p-invalid" : ""}`}
+                            {...register("fullName")}
+                            className={`form-control ${errors.fullName ? "p-invalid" : ""}`}
                         />
                         <small className="p-error">
-                            {errors.hoTen?.message?.toString()}
+                            {errors.fullName?.message?.toString()}
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
-                        <label htmlFor="sdt">Số điện thoại *</label>
+                        <label htmlFor="phoneNumber">Số điện thoại *</label>
                         <InputText
-                            id="sdt"
+                            id="phoneNumber"
                             required
-                            {...register("sdt")}
-                            className={`form-control ${errors.sdt ? "p-invalid" : ""}`}
+                            {...register("phoneNumber")}
+                            className={`form-control ${errors.phoneNumber ? "p-invalid" : ""}`}
                         />
                         <small className="p-error">
-                            {errors.sdt?.message?.toString()}
+                            {errors.phoneNumber?.message?.toString()}
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
@@ -250,170 +258,169 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
-                        <label htmlFor="bangCap">Bằng cấp *</label>
+                        <label htmlFor="degree">Bằng cấp *</label>
                         <InputText
-                            id="bangCap"
-                            {...register("bangCap")}
-                            className={`form-control ${errors.bangCap ? "p-invalid" : ""
+                            id="degree"
+                            {...register("degree")}
+                            className={`form-control ${errors.degree ? "p-invalid" : ""
                                 }`}
                         />
                         <small className="p-error">
-                            {errors.bangCap?.message?.toString()}
+                            {errors.degree?.message?.toString()}
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
-                        <label htmlFor="gioiTinh">Giới tính *</label>
+                        <label htmlFor="gender">Giới tính *</label>
                         <Dropdown
-                            id="gioiTinh"
+                            id="gender"
                             options={genders}
-                            value={getValues("gioiTinh")}
-                            {...register("gioiTinh")}
+                            value={getValues("gender")}
+                            {...register("gender")}
                             optionLabel="label"
                             optionValue="value"
-                            className={`form-control ${errors.gioiTinh ? "p-invalid" : ""
+                            className={`form-control ${errors.gender ? "p-invalid" : ""
                                 }`}
                             onChange={(e) =>
-                                setValue("gioiTinh", e.target.value, {
+                                setValue("gender", e.target.value, {
                                     shouldValidate: true,
                                 })
                             }
                         />
                         <small className="p-error">
-                            {errors.gioiTinh?.message?.toString()}
+                            {errors.gender?.message?.toString()}
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
-                        <label htmlFor="namSinh">Năm sinh *</label>
+                        <label htmlFor="dateOfBirth">Năm sinh *</label>
                         <InputText
-                            id="namSinh"
-                            {...register("namSinh")}
-                            className={`form-control ${errors.namSinh ? "p-invalid" : ""
+                            id="dateOfBirth"
+                            {...register("dateOfBirth")}
+                            className={`form-control ${errors.dateOfBirth ? "p-invalid" : ""
                                 }`}
                         />
                         <small className="p-error">
-                            {errors.namSinh?.message?.toString()}
-                        </small>
-                    </div>
-
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="danhGiaNgonNgu">Đánh giá ngôn ngữ *</label>
-                        <InputText
-                            id="danhGiaNgonNgu"
-                            {...register("danhGiaNgonNgu")}
-                            className={`form-control ${errors.danhGiaNgonNgu ? "p-invalid" : ""
-                                }`}
-                        />
-                        <small className="p-error">
-                            {errors.danhGiaNgonNgu?.message?.toString()}
+                            {errors.dateOfBirth?.message?.toString()}
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
-                        <label htmlFor="luongMongMuon">Lương mong muốn *</label>
-                        <InputNumber
-                            value={getValues("luongMongMuon")}
-                            onValueChange={(e) => setValue('luongMongMuon', e.value ?? 0)}
-                            className={`form-control ${errors.luongMongMuon ? "p-invalid" : ""}`}
-                        />
-                        <small className="p-error">
-                            {errors.luongMongMuon?.message?.toString()}
-                        </small>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="nganh">Chuyên nghành *</label>
-                        <InputText
-                            id="nganh"
-                            {...register("nganh")}
-                            className={`form-control ${errors.nganh ? "p-invalid" : ""}`}
-                        />
-                        <small className="p-error">
-                            {errors.nganh?.message?.toString()}
-                        </small>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="truong">Trường *</label>
-                        <InputText
-                            id="truong"
-                            {...register("truong")}
-                            className={`form-control ${errors.truong ? "p-invalid" : ""}`}
-                        />
-                        <small className="p-error">
-                            {errors.truong?.message?.toString()}
-                        </small>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="kinhNghiem">Kinh nghiệm *</label>
-                        <InputText
-                            id="kinhNghiem"
-                            {...register("kinhNghiem")}
-                            className={`form-control ${errors.kinhNghiem ? "p-invalid" : ""
-                                }`}
-                        />
-                        <small className="p-error">
-                            {errors.kinhNghiem?.message?.toString()}
-                        </small>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="choOHienTai">Chỗ ở hiện tại *</label>
-                        <InputText
-                            id="choOHienTai"
-                            {...register("choOHienTai")}
-                            className={`form-control ${errors.choOHienTai ? "p-invalid" : ""
-                                }`}
-                        />
-                        <small className="p-error">
-                            {errors.choOHienTai?.message?.toString()}
-                        </small>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="nguyenVong">Nguyện vọng *</label>
-                        <InputText
-                            id="nguyenVong"
-                            {...register("nguyenVong")}
-                            className={`form-control ${errors.nguyenVong ? "p-invalid" : ""
-                                }`}
-                        />
-                        <small className="p-error">
-                            {errors.nguyenVong?.message?.toString()}
-                        </small>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <label htmlFor="ngonNgu">Ngôn ngữ *</label>
+                        <label htmlFor="languages">Ngôn ngữ *</label>
                         <MultiSelect
                             inputId="multiselect"
-                            value={getValues("ngonNgu")}
+                            value={getValues("languages")}
                             optionValue="value"
                             optionLabel="label"
-                            className={`form-control ${errors.ngonNgu ? "p-invalid" : ""
+                            className={`form-control ${errors.languages ? "p-invalid" : ""
                                 }`}
                             options={languages?.data}
                             onChange={(e) =>
-                                setValue("ngonNgu", e.target.value, {
+                                setValue("languages", e.target.value, {
                                     shouldValidate: true,
                                 })
                             }
                         />
                         <small className="p-error">
-                            {errors.ngonNgu?.message?.toString()}
+                            {errors.languages?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="levelAssessment">Đánh giá ngôn ngữ </label>
+                        <InputText
+                            id="levelAssessment"
+                            {...register("levelAssessment")}
+                            className={`form-control ${errors.levelAssessment ? "p-invalid" : ""
+                                }`}
+                        />
+                        <small className="p-error">
+                            {errors.levelAssessment?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="salary">Lương mong muốn *</label>
+                        <InputNumber
+                            value={getValues("salary")}
+                            onValueChange={(e) => setValue('salary', e.value ?? 0)}
+                            className={`form-control ${errors.salary ? "p-invalid" : ""}`}
+                        />
+                        <small className="p-error">
+                            {errors.salary?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="major">Chuyên ngành *</label>
+                        <InputText
+                            id="major"
+                            {...register("major")}
+                            className={`form-control ${errors.major ? "p-invalid" : ""}`}
+                        />
+                        <small className="p-error">
+                            {errors.major?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="school">Trường *</label>
+                        <InputText
+                            id="school"
+                            {...register("school")}
+                            className={`form-control ${errors.school ? "p-invalid" : ""}`}
+                        />
+                        <small className="p-error">
+                            {errors.school?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="experience">Kinh nghiệm *</label>
+                        <InputText
+                            id="experience"
+                            {...register("experience")}
+                            className={`form-control ${errors.experience ? "p-invalid" : ""
+                                }`}
+                        />
+                        <small className="p-error">
+                            {errors.experience?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="address">Chỗ ở hiện tại *</label>
+                        <InputText
+                            id="address"
+                            {...register("address")}
+                            className={`form-control ${errors.address ? "p-invalid" : ""
+                                }`}
+                        />
+                        <small className="p-error">
+                            {errors.address?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="wish">Nguyện vọng *</label>
+                        <InputText
+                            id="wish"
+                            {...register("wish")}
+                            className={`form-control ${errors.wish ? "p-invalid" : ""
+                                }`}
+                        />
+                        <small className="p-error">
+                            {errors.wish?.message?.toString()}
                         </small>
                     </div>
                     <div className="field col-12 md:col-6">
                         <label htmlFor="facebook">Facebook </label>
                         <InputText
-                            id="facebook"
-                            {...register("facebook")}
+                            id="faceBook"
+                            {...register("faceBook")}
                             className={`form-control`}
                         />
                     </div>
                     <div className="field col-12 md:col-6">
-                        <label htmlFor="queQuan">Quê quán </label>
+                        <label htmlFor="homeTown">Quê quán </label>
                         <InputText
-                            id="queQuan"
-                            {...register("queQuan")}
-                            className={`form-control ${errors.queQuan ? "p-invalid" : ""
+                            id="homeTown"
+                            {...register("homeTown")}
+                            className={`form-control ${errors.homeTown ? "p-invalid" : ""
                                 }`}
                         />
                         <small className="p-error">
-                            {errors.queQuan?.message?.toString()}
+                            {errors.homeTown?.message?.toString()}
                         </small>
                     </div>
                 </div>

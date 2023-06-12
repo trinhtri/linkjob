@@ -163,7 +163,7 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
         refetch();
     };
     const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
-        return formatCurrency(rowData.luongMongMuon as number);
+        return formatCurrency(rowData.salary as number);
     };
 
     const setInterviewedMutation = useMutation((data: SetInterviewedRequest) => candidateService.setInterviewed(data));
@@ -217,7 +217,10 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
             acceptClassName: 'p-button-danger'
         });
     };
-
+    const onViewCV = (data: any) => {
+        if (data.cvUrl)
+            window.open(data.cvUrl);
+    }
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -245,8 +248,8 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                             command: () => onEdit(rowData)
                         },
                         {
-                            label: 'Delete',
-                            command: () => confirmDelete(rowData)
+                            label: 'Xem CV',
+                            command: () => onViewCV(rowData)
                         }
                     ]}
                 />
@@ -267,10 +270,10 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                     className="datatable-responsive"
                     emptyMessage="No users found."
                 >
-                    <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="tenCty" header="Tên Cty" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="companyName" header="Tên Cty" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="interviewSchedule" header="Thời gian" headerStyle={{ minWidth: '5rem' }} dataType="date" body={interviewTemplate} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>

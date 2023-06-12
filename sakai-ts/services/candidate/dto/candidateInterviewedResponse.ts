@@ -1,11 +1,11 @@
 export interface CandidateInterviewedResponse {
   id: string;
-  hoTen: string;
-  sdt: string;
+  fullName: string;
+  phoneNumber: string;
   email: string;
-  namSinh: string;
-  luongMongMuon: number;
-  tenCty: string;
+  dateOfBirth: string;
+  salary: number;
+  companyName: string;
   cvName: string;
   cvUrl: string;
   interviewSchedule: Date | null;

@@ -113,7 +113,10 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         onReloadCountStatus();
         refetch();
     };
-
+    const onViewCV = (data: any) => {
+        if (data.cvUrl)
+            window.open(data.cvUrl);
+    }
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -135,14 +138,18 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                         {
                             label: 'Chỉnh sửa',
                             command: () => onEdit(rowData)
-                        }
+                        },
+                        {
+                            label: 'Xem CV',
+                            command: () => onViewCV(rowData)
+                        },
                     ]}
                 />
             </>
         );
     };
     const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
-        return formatCurrency(rowData.luongMongMuon as number);
+        return formatCurrency(rowData.salary as number);
     };
     return (
         <div className="grid crud-demo">
@@ -155,10 +162,10 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     className="datatable-responsive"
                     emptyMessage="No users found."
                 >
-                    <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="tenCty" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="companyName" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>

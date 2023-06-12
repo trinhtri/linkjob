@@ -17,13 +17,13 @@ import SendCV from './sendCV';
 import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
 import { formatCurrency } from '../../pages/utilities/formatCurrency';
-
+import axios from 'axios';
+import { saveAs } from "file-saver";
 interface Props {
     filter: SearchCandidateCommonRequest,
     onReloadCountStatus: () => void;
 }
 
-// const SearchJobTable = () => {
 const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
@@ -131,8 +131,13 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
     };
 
     const salaryBodyTemplate = (rowData: any) => {
-        return formatCurrency(rowData.luongMongMuon as number);
+        return formatCurrency(rowData.salary as number);
     };
+    const onViewCV = (data: any) => {
+        if (data.cvUrl)
+            window.open(data.cvUrl);
+    }
+
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -150,6 +155,10 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
                         {
                             label: 'Chỉnh sửa',
                             command: () => onEdit(rowData)
+                        },
+                        {
+                            label: 'Xem CV',
+                            command: () => onViewCV(rowData)
                         },
                         {
                             label: 'Delete',
@@ -172,15 +181,15 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
                     className="datatable-responsive"
                     emptyMessage="No users found."
                 >
-                    <Column field="hoTen" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="sdt" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="gioiTinh" header="Giới tính" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="truong" header="Trường" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="nganh" header="Chuyên nghành" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="ngonNgu" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="kinhNghiem" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="nguyenVong" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="gender" header="Giới tính" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="school" header="Trường" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="major" header="Chuyên ngành" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="languages" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="experience" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="wish" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
