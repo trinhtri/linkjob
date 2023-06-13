@@ -9,16 +9,13 @@ import { Menu } from 'primereact/menu';
 import { Paginator } from 'primereact/paginator';
 import { rowsPerPageOptions } from '../../public/constant';
 
-import { userService } from '../../services/user/userService';
 import { candidateService } from '../../services/candidate/candidateService';
-import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
 import moment from 'moment';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
-import SetInterviewSchedule from './setInterviewSchedule';
+import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { SetPassInterviewRequest } from '../../services/candidate/dto/setPassInterviewRequest';
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -150,20 +147,6 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
         refetch();
     };
 
-    const handleCancelInterviewSchedule = () => {
-        setVisibleSchedule(false);
-        refetch();
-    };
-
-    const onSetPassInterview = (data: any) => {
-        setCurrentId(data.id);
-        setVisiblePassInterview(true);
-    }
-
-    const handleCancelPassInterview = () => {
-        setVisiblePassInterview(false);
-        refetch();
-    };
     const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
         return formatCurrency(rowData.salary as number);
     };
@@ -171,6 +154,10 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
         if (data.cvUrl)
             window.open(data.cvUrl);
     }
+    const interviewTemplate = (rowData: CandidateInterviewResponse) => {
+        return moment(rowData.interviewSchedule).format('DD/MM/YYYY HH:mm');
+    }
+
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -202,9 +189,7 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
             </>
         );
     };
-    const interviewTemplate = (rowData: CandidateInterviewResponse) => {
-        return moment(rowData.interviewSchedule).format('DD/MM/YYYY HH:mm');
-    }
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -230,16 +215,6 @@ const InterviewedTable = ({ filter, onReloadCountStatus }: Props) => {
                     currentId={currentId}
                     onCloseModal={() => handleCancelChangeSendCV()}
                 />
-                <SetInterviewSchedule
-                    visible={visibleSchedule}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelInterviewSchedule()}
-                />
-                {/* <SetPassInterview
-                    visible={visiblePassInterview}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelPassInterview()}
-                /> */}
                 <ConfirmDialog />
             </div>
         </div>

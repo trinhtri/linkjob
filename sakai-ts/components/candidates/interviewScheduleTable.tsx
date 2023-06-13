@@ -17,9 +17,7 @@ import SendCV from './sendCV';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
 import moment from 'moment';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
-import SetInterviewSchedule from './setInterviewSchedule';
-import { SetPassInterviewRequest } from '../../services/candidate/dto/setPassInterviewRequest';
+import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { SetInterviewedRequest } from '../../services/candidate/dto/setInterviewedRequest';
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -28,11 +26,10 @@ interface Props {
 
 const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
-    const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
-    const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [currentId, setCurrentId] = useState<string>("");
+    const router = useRouter();
 
     const [lazyState, setlazyState] = useState<SearchCandidateRequest>({
         first: 0,
@@ -108,32 +105,6 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
         });
     };
 
-    // const setPassInterviewMutation = useMutation((data: SetPassInterviewRequest) => candidateService.setPassInterview(data));
-    // const confirmPassInterview = (data: any) => {
-    //     confirmDialog({
-    //         message: 'Bạn có chắc chắn ứng viên đã đỗ phỏng vấn không?',
-    //         header: 'Xác nhận',
-    //         icon: 'pi pi-exclamation-triangle',
-    //         accept: () => {
-    //             const request = {
-    //                 candidateId: data.id,
-    //                 companyId: data.companyId
-    //             };
-    //             setPassInterviewMutation.mutate(request, {
-    //                 onSuccess: () => {
-    //                     toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
-    //                 },
-    //                 onError: (error: any) => {
-    //                     toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
-    //                 }
-    //             });
-    //         },
-    //         acceptClassName: 'p-button-danger'
-    //     });
-    // };
-
-    const router = useRouter();
-
     const onEdit = (data: any) => {
         router.push(`/candidates/${data.id}`);
     }
@@ -148,20 +119,6 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
         refetch();
     };
 
-    const handleCancelInterviewSchedule = () => {
-        setVisibleSchedule(false);
-        refetch();
-    };
-
-    const onSetPassInterview = (data: any) => {
-        setCurrentId(data.id);
-        setVisiblePassInterview(true);
-    }
-
-    const handleCancelPassInterview = () => {
-        setVisiblePassInterview(false);
-        refetch();
-    };
     const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
         return formatCurrency(rowData.salary as number);
     };
@@ -192,31 +149,6 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
         });
     };
 
-    const setRejectCVMutation = useMutation((data: SetInterviewedRequest) => candidateService.setRejectInterview(data));
-    const confirmRejectCV = (data: any) => {
-        confirmDialog({
-            message: 'Bạn có chắc chắn ứng viên đã phỏng vấn không?',
-            header: 'Xác nhận',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                const request = {
-                    candidateId: data.id,
-                    companyId: data.companyId
-                };
-                setRejectCVMutation.mutate(request, {
-                    onSuccess: () => {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
-                        onReloadCountStatus();
-                        refetch();
-                    },
-                    onError: (error: any) => {
-                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
-                    }
-                });
-            },
-            acceptClassName: 'p-button-danger'
-        });
-    };
     const onViewCV = (data: any) => {
         if (data.cvUrl)
             window.open(data.cvUrl);
@@ -238,10 +170,6 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                         {
                             label: 'Đã phỏng vấn',
                             command: () => confirmInterviewed(rowData)
-                        },
-                        {
-                            label: 'Cty từ chối',
-                            command: () => confirmRejectCV(rowData)
                         },
                         {
                             label: 'Chỉnh sửa',
@@ -270,12 +198,13 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                     className="datatable-responsive"
                     emptyMessage="No users found."
                 >
-                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '4rem' }} ></Column>
+                    <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '4rem' }} ></Column>
+                    <Column field="email" header="Email" headerStyle={{ minWidth: '4rem' }} ></Column>
                     <Column field="companyName" header="Tên Cty" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="interviewSchedule" header="Thời gian" headerStyle={{ minWidth: '5rem' }} dataType="date" body={interviewTemplate} ></Column>
+                    <Column body={interviewTemplate} header="Thời gian" headerStyle={{ minWidth: '3rem' }}  ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="note" header="Ghi chú PV" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
@@ -284,16 +213,6 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                     currentId={currentId}
                     onCloseModal={() => handleCancelChangeSendCV()}
                 />
-                <SetInterviewSchedule
-                    visible={visibleSchedule}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelInterviewSchedule()}
-                />
-                {/* <SetPassInterview
-                    visible={visiblePassInterview}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelPassInterview()}
-                /> */}
                 <ConfirmDialog />
             </div>
         </div>

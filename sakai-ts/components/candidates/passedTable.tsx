@@ -9,14 +9,12 @@ import { Menu } from 'primereact/menu';
 import { Paginator } from 'primereact/paginator';
 import { rowsPerPageOptions } from '../../public/constant';
 
-import { userService } from '../../services/user/userService';
 import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
-import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
 import { AcceptOfferRequest } from '../../services/candidate/dto/acceptOfferRequest';
 
@@ -27,8 +25,6 @@ interface Props {
 
 const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
-    const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
-    const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [currentId, setCurrentId] = useState<string>("");
@@ -88,26 +84,6 @@ const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
             pageSize: event.rows
         })
     }
-
-    const deleteUserMutation = useMutation((userId) => userService.delete(userId));
-    const confirmDelete = (data: any) => {
-        confirmDialog({
-            message: 'Are you sure you want to delete user?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                deleteUserMutation.mutate(data.userId, {
-                    onSuccess() {
-                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Delete user successfully', life: 3000 });
-                        refetch();
-                    }
-                });
-            },
-            acceptClassName: 'p-button-danger'
-        });
-    };
-
-
     const acceptOfferMutation = useMutation((request: AcceptOfferRequest) => candidateService.acceptOffer(request));
     const confirmAcceptOffer = (data: any) => {
         console.log("data", data);
@@ -172,15 +148,6 @@ const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
         refetch();
     };
 
-    const onSetInterviewSchedule = (data: any) => {
-        setCurrentId(data.id);
-        setVisibleSchedule(true);
-    }
-    const handleCancelInterviewSchedule = () => {
-        setVisibleSchedule(false);
-        onReloadCountStatus();
-        refetch();
-    };
     const onViewCV = (data: any) => {
         if (data.cvUrl)
             window.open(data.cvUrl);
@@ -242,11 +209,6 @@ const PassedTable = ({ filter, onReloadCountStatus }: Props) => {
                     visible={visibleSendCV}
                     currentId={currentId}
                     onCloseModal={() => handleCancelChangeSendCV()}
-                />
-                <SetInterviewSchedule
-                    visible={visibleSchedule}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelInterviewSchedule()}
                 />
                 <ConfirmDialog />
             </div>

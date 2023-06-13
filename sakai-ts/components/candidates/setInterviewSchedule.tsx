@@ -4,39 +4,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { Toast } from 'primereact/toast';
 import { candidateService } from '../../services/candidate/candidateService';
-import { commonLookupService } from '../../services/commonLookup/commonLookupService';
-import { CommonLookupRequest } from '../../services/commonLookup/dto/commonLookupRequest';
 import { Calendar } from 'primereact/calendar';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Dropdown } from 'primereact/dropdown';
 import { SetInterviewScheduleRequest } from '../../services/candidate/dto/setInterviewScheduleRequest';
-import moment from 'moment';
 interface Props {
     visible: boolean;
     currentId: string;
+    companyId: string;
+    companyName: string;
     onCloseModal: () => void;
 }
 
-const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
+const SetInterviewSchedule = ({ visible, currentId, companyId, companyName, onCloseModal }: Props) => {
     const toast = useRef<Toast>(null);
     const [timeInterview, setTimeInterview] = useState(new Date());
-
-    const { data: companies } = useQuery(
-        ["Companies"],
-        () => {
-            let param = {
-                type: "Company",
-                parentId: currentId
-            } as CommonLookupRequest;
-            return commonLookupService.getLookup(param);
-        },
-        {
-            enabled: visible && !!currentId
-        }
-    );
 
     const validationSchema = yup.object().shape({
         companyId: yup.string().required("Vui lòng chọn công ty"),
@@ -46,7 +30,6 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
         register,
         handleSubmit,
         reset,
-        getValues,
         setValue,
         formState: { errors }
     } = useForm<SetInterviewScheduleRequest>({
@@ -57,7 +40,9 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
     useEffect(() => {
         if (currentId)
             setValue("candidateId", currentId);
-    }, [currentId, setValue, visible]);
+        if (companyId)
+            setValue("companyId", companyId);
+    }, [companyId, currentId, setValue, visible]);
 
     const setInterviewScheduleMutation = useMutation((data: SetInterviewScheduleRequest) => candidateService.setInterviewSchedule(data));
     const onSubmit = (data: SetInterviewScheduleRequest) => {
@@ -87,28 +72,8 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
     return (
         <>
             <Toast ref={toast} />
-            <Dialog visible={visible} style={{ width: '650px' }} header={'Đặt lịch phỏng vấn'} modal className="p-fluid" footer={productDialogFooter} onHide={onCloseModal}>
+            <Dialog visible={visible} style={{ width: '650px' }} header={`Đặt lịch phỏng vấn cho ${companyName}`} modal className="p-fluid" footer={productDialogFooter} onHide={onCloseModal}>
                 <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl ">
-                    <div className="field">
-                        <label htmlFor="companyId">Công ty *</label>
-                        <Dropdown
-                            id="companyId"
-                            options={companies?.data}
-                            value={getValues("companyId")}
-                            optionLabel="label"
-                            optionValue="value"
-                            className={`form-control ${errors.companyId ? "p-invalid" : ""
-                                }`}
-                            onChange={(e) =>
-                                setValue("companyId", e.value, {
-                                    shouldValidate: true,
-                                })
-                            }
-                        />
-                        <small className="p-error">
-                            {errors.companyId?.message?.toString()}
-                        </small>
-                    </div>
                     <div className="field">
                         <label htmlFor="schedule">Ngày phỏng vấn</label>
                         <Calendar dateFormat="dd/mm/yy"

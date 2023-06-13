@@ -4,7 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
 import { Paginator } from 'primereact/paginator';
 import { rowsPerPageOptions } from '../../public/constant';
@@ -16,8 +16,10 @@ import { CandidateResponse } from '../../services/candidate/dto/candidateRespons
 import SendCV from './sendCV';
 import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
+import moment from 'moment';
+import { SetInterviewedRequest } from '../../services/candidate/dto/setInterviewedRequest';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -31,6 +33,9 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [currentId, setCurrentId] = useState<string>("");
+    const [companyId, setCompanyId] = useState<string>("");
+    const [companyName, setCompanyName] = useState<string>("");
+    const router = useRouter();
 
     const [lazyState, setlazyState] = useState<SearchCandidateRequest>({
         first: 0,
@@ -88,8 +93,6 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         })
     }
 
-    const router = useRouter();
-
     const onEdit = (data: any) => {
         router.push(`/candidates/${data.id}`);
     }
@@ -106,6 +109,8 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
 
     const onSetInterviewSchedule = (data: any) => {
         setCurrentId(data.id);
+        setCompanyId(data.companyId);
+        setCompanyName(data.companyName);
         setVisibleSchedule(true);
     }
     const handleCancelInterviewSchedule = () => {
@@ -117,6 +122,37 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         if (data.cvUrl)
             window.open(data.cvUrl);
     }
+    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
+        return formatCurrency(rowData.salary as number);
+    };
+    const createdAtTemplate = (rowData: any) => {
+        return moment(rowData.createdAt).format('DD/MM/YYYY');
+    }
+    const setRejectCVMutation = useMutation((data: SetInterviewedRequest) => candidateService.setRejectInterview(data));
+    const confirmRejectCV = (data: any) => {
+        confirmDialog({
+            message: 'Bạn có chắc chắn ứng viên đã phỏng vấn không?',
+            header: 'Xác nhận',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                const request = {
+                    candidateId: data.id,
+                    companyId: data.companyId
+                };
+                setRejectCVMutation.mutate(request, {
+                    onSuccess: () => {
+                        toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Cập nhật thành công', life: 3000 });
+                        onReloadCountStatus();
+                        refetch();
+                    },
+                    onError: (error: any) => {
+                        toast.current?.show({ severity: 'error', summary: 'Error', detail: "Cập nhật thất bại", life: 3000 });
+                    }
+                });
+            },
+            acceptClassName: 'p-button-danger'
+        });
+    };
     const actionBodyTemplate = (rowData: CandidateResponse) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const menu = useRef<Menu>(null);
@@ -136,6 +172,10 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                             command: () => onSetInterviewSchedule(rowData)
                         },
                         {
+                            label: 'Cty từ chối',
+                            command: () => confirmRejectCV(rowData)
+                        },
+                        {
                             label: 'Chỉnh sửa',
                             command: () => onEdit(rowData)
                         },
@@ -147,9 +187,6 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                 />
             </>
         );
-    };
-    const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
-        return formatCurrency(rowData.salary as number);
     };
     return (
         <div className="grid crud-demo">
@@ -167,6 +204,7 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="companyName" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column body={createdAtTemplate} header="Ngày gửi CV" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
@@ -178,6 +216,8 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                 <SetInterviewSchedule
                     visible={visibleSchedule}
                     currentId={currentId}
+                    companyId={companyId}
+                    companyName={companyName}
                     onCloseModal={() => handleCancelInterviewSchedule()}
                 />
                 <ConfirmDialog />

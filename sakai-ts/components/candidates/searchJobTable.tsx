@@ -14,11 +14,8 @@ import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
-import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
-import axios from 'axios';
-import { saveAs } from "file-saver";
+import { formatCurrency } from '../../public/utilities/formatCurrency';
 import moment from 'moment';
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -122,21 +119,16 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
         refetch();
     };
 
-    const onSetInterviewSchedule = (data: any) => {
-        setCurrentId(data.id);
-        setVisibleSchedule(true);
-    }
-    const handleCancelInterviewSchedule = () => {
-        setVisibleSchedule(false);
-        refetch();
-    };
-
     const salaryBodyTemplate = (rowData: any) => {
         return formatCurrency(rowData.salary as number);
     };
     const onViewCV = (data: any) => {
         if (data.cvUrl)
             window.open(data.cvUrl);
+    }
+
+    const createdAtTemplate = (rowData: any) => {
+        return moment(rowData.createdAt).format('DD/MM/YYYY');
     }
 
     const actionBodyTemplate = (rowData: CandidateResponse) => {
@@ -170,15 +162,6 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
             </>
         );
     };
-    const createdAtTemplate = (rowData: any) => {
-        return moment(rowData.createdAt).format('DD/MM/YYYY');
-    }
-    const schoolAndMajorTemplate = (rowData: any) => {
-        return <>
-            <p>Trường: {rowData.school}</p>
-            <p>Chuyên ngành: {rowData.school}</p>
-        </>
-    }
 
     return (
         <div className="grid crud-demo">
@@ -209,11 +192,6 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
                     visible={visibleSendCV}
                     currentId={currentId}
                     onCloseModal={() => handleCancelChangeSendCV()}
-                />
-                <SetInterviewSchedule
-                    visible={visibleSchedule}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelInterviewSchedule()}
                 />
                 <ConfirmDialog />
             </div>

@@ -14,9 +14,8 @@ import { candidateService } from '../../services/candidate/candidateService';
 import { useRouter } from 'next/router';
 import { CandidateResponse } from '../../services/candidate/dto/candidateResponse';
 import SendCV from './sendCV';
-import SetInterviewSchedule from './setInterviewSchedule';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
-import { formatCurrency } from '../../pages/utilities/formatCurrency';
+import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
 
 interface Props {
@@ -25,8 +24,6 @@ interface Props {
 
 const AcceptedTable = ({ filter }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
-    const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
-    const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [currentId, setCurrentId] = useState<string>("");
@@ -133,10 +130,6 @@ const AcceptedTable = ({ filter }: Props) => {
         refetch();
     };
 
-    const handleCancelInterviewSchedule = () => {
-        setVisibleSchedule(false);
-        refetch();
-    };
     const onViewCV = (data: any) => {
         if (data.cvUrl)
             window.open(data.cvUrl);
@@ -194,11 +187,6 @@ const AcceptedTable = ({ filter }: Props) => {
                     visible={visibleSendCV}
                     currentId={currentId}
                     onCloseModal={() => handleCancelChangeSendCV()}
-                />
-                <SetInterviewSchedule
-                    visible={visibleSchedule}
-                    currentId={currentId}
-                    onCloseModal={() => handleCancelInterviewSchedule()}
                 />
                 <ConfirmDialog />
             </div>
