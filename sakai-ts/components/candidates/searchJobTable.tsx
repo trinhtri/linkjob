@@ -19,6 +19,7 @@ import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../serv
 import { formatCurrency } from '../../pages/utilities/formatCurrency';
 import axios from 'axios';
 import { saveAs } from "file-saver";
+import moment from 'moment';
 interface Props {
     filter: SearchCandidateCommonRequest,
     onReloadCountStatus: () => void;
@@ -169,6 +170,15 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
             </>
         );
     };
+    const createdAtTemplate = (rowData: any) => {
+        return moment(rowData.createdAt).format('DD/MM/YYYY');
+    }
+    const schoolAndMajorTemplate = (rowData: any) => {
+        return <>
+            <p>Trường: {rowData.school}</p>
+            <p>Chuyên ngành: {rowData.school}</p>
+        </>
+    }
 
     return (
         <div className="grid crud-demo">
@@ -191,6 +201,7 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
                     <Column field="experience" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="wish" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column body={createdAtTemplate} header="Ngày tạo" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>

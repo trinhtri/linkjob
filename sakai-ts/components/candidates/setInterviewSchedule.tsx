@@ -22,6 +22,8 @@ interface Props {
 
 const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
     const toast = useRef<Toast>(null);
+    const [timeInterview, setTimeInterview] = useState(new Date());
+
     const { data: companies } = useQuery(
         ["Companies"],
         () => {
@@ -50,9 +52,6 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
     } = useForm<SetInterviewScheduleRequest>({
         mode: 'onBlur',
         resolver: yupResolver(validationSchema),
-        defaultValues: {
-            interviewSchedule: new Date()
-        }
     });
 
     useEffect(() => {
@@ -65,6 +64,7 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
         const request = {
             ...data
         };
+        request.interviewSchedule = timeInterview;
         setInterviewScheduleMutation.mutate(request, {
             onSuccess: () => {
                 toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Gửi CV thành công', life: 3000 });
@@ -84,7 +84,6 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
         </>
     );
 
-    const [timeInterview, setTimeInterview] = useState(moment.now);
     return (
         <>
             <Toast ref={toast} />
@@ -114,11 +113,9 @@ const SetInterviewSchedule = ({ visible, currentId, onCloseModal }: Props) => {
                         <label htmlFor="schedule">Ngày phỏng vấn</label>
                         <Calendar dateFormat="dd/mm/yy"
                             id='NgayPV'
-                            value={getValues("interviewSchedule")}
-                            {...register("interviewSchedule")}
+                            value={timeInterview}
                             onChange={(e: any) =>
-                                setValue("interviewSchedule", e.value)
-                            }
+                                setTimeInterview(e.value)}
                         ></Calendar>
                     </div>
                     <div className="field">
