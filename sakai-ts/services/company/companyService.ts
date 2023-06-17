@@ -3,6 +3,7 @@ import api from "../api";
 import { PaginatedList } from "../paginatedList";
 import { CreateOrUpdateCompanyRequest } from "./dto/createOrUpdateCompanyRequest";
 import { CompanyResponse } from "./dto/companyResponse";
+import { SearchCompanyRequest } from "./dto/SearchCompanyRequest";
 
 export const companyService = {
   create: (body: CreateOrUpdateCompanyRequest) => {
@@ -19,7 +20,7 @@ export const companyService = {
       `${ApiEndpoint.company}/${id}`
     );
   },
-  getsPaging: (params: any) => {
+  getsPaging: (params: SearchCompanyRequest) => {
     return api.get<PaginatedList<CompanyResponse>>(ApiEndpoint.company, {
       params: params,
     });

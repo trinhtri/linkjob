@@ -25,18 +25,52 @@ const CreateCompany = ({ visible, errors, isLoading, onCancel, onSubmit, registe
     );
     return (
         <>
-            <Dialog visible={visible} style={{ width: '450px' }}
+            <Dialog visible={visible} style={{ width: '750px' }}
                 header={getValues('id') != undefined ? 'Chỉnh sửa công ty' : 'Thêm mới công ty'}
                 modal className="p-fluid" footer={productDialogFooter} onHide={onCancel}>
                 <form onSubmit={onSubmit} className="rounded-xl ">
                     <div className="field">
-                        <label htmlFor="name">Tên *</label>
+                        <label htmlFor="name">Tên cty*</label>
                         <InputText id="name" required autoFocus {...register('name')} className={`form-control ${errors.name ? 'p-invalid' : ''}`} />
                         <small className="p-error">{errors.name?.message}</small>
                     </div>
                     <div className="field">
+                        <label htmlFor="connecter">Nhân sự</label>
+                        <InputText id="connecter"  {...register('connecter')} className={`form-control ${errors.connecter ? 'p-invalid' : ''}`} />
+                        <small className="p-error">{errors.connecter?.message}</small>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="email">Email</label>
+                        <InputText id="email"  {...register('email')} className={`form-control ${errors.name ? 'p-invalid' : ''}`} />
+                        <small className="p-error">{errors.email?.message}</small>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="landline">Điện thoại bàn</label>
+                        <InputText id="landline"  {...register('landline')} className={`form-control ${errors.name ? 'p-invalid' : ''}`} />
+                        <small className="p-error">{errors.landline?.message}</small>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="phoneNumber">Sdt cá nhân</label>
+                        <InputText id="phoneNumber"  {...register('phoneNumber')} className={`form-control ${errors.name ? 'p-invalid' : ''}`} />
+                        <small className="p-error">{errors.phoneNumber?.message}</small>
+                    </div>
+                    <div className="field">
                         <label htmlFor="address">Địa chỉ</label>
-                        <InputTextarea autoResize rows={3} cols={30}   {...register("address")} />
+                        <InputText id="address"  {...register('address')} className={`form-control ${errors.address ? 'p-invalid' : ''}`} />
+                    </div>
+                    <div className="field">
+                        <label htmlFor="connecter">Nhân sự</label>
+                        <InputText id="connecter"  {...register('connecter')} className={`form-control ${errors.name ? 'p-invalid' : ''}`} />
+                        <small className="p-error">{errors.name?.message}</small>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="connecter">Nhân sự</label>
+                        <InputText id="connecter"  {...register('connecter')} className={`form-control ${errors.name ? 'p-invalid' : ''}`} />
+                        <small className="p-error">{errors.name?.message}</small>
+                    </div>
+                    <div className="field">
+                        <label htmlFor="note">Ghi chú</label>
+                        <InputTextarea autoResize rows={3} cols={30}   {...register("note")} />
                     </div>
                 </form>
             </Dialog>

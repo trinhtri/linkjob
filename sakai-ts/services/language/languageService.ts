@@ -3,6 +3,7 @@ import api from "../api";
 import { PaginatedList } from "../paginatedList";
 import { LanguageResponse } from "./dto/languageResponse";
 import { CreateOrUpdateLanguageRequest } from "./dto/createOrUpdateLanguageRequest";
+import { SearchLanguageRequest } from "./dto/searchLanguageRequest";
 
 export const languageService = {
   create: (body: CreateOrUpdateLanguageRequest) => {
@@ -19,7 +20,7 @@ export const languageService = {
       `${ApiEndpoint.language}/${id}`
     );
   },
-  getsPaging: (params: any) => {
+  getsPaging: (params: SearchLanguageRequest) => {
     return api.get<PaginatedList<LanguageResponse>>(ApiEndpoint.language, {
       params: params,
     });

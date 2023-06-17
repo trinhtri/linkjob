@@ -52,10 +52,14 @@ const CreateUser = ({ visible, onCancel, onCreatedUser }: Props) => {
         });
     };
 
+    const onHandleCanncel = () => {
+        reset();
+        onCancel();
+    }
 
     const productDialogFooter = (
         <>
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text p-button-danger" onClick={onCancel} />
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text p-button-danger" onClick={onHandleCanncel} />
             <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit(onSubmit)} loading={addUserMutation.isLoading} />
         </>
     );

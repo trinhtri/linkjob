@@ -4,46 +4,37 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import React, { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from 'react-query';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
 import { languageService } from '../../services/language/languageService';
 import { CreateOrUpdateLanguageRequest } from '../../services/language/dto/createOrUpdateLanguageRequest';
+import { LanguageResponse } from '../../services/language/dto/languageResponse';
+import { SearchCompanyRequest } from '../../services/company/dto/SearchCompanyRequest';
+import debounce from 'lodash.debounce';
+import { Paginator } from 'primereact/paginator';
+import { rowsPerPageOptions } from '../../public/constant';
 import CreateLanguage from '../../components/languages/CreateLanguage';
 
 const Languages = () => {
     const [visible, setVisible] = useState(false);
+    const [currentId, setCurrentId] = useState<string>('');
     const toast = useRef<Toast>(null);
     const dt = useRef(null);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [filterSearch, setFilterSearch] = useState(null);
-    const validationSchema = yup.object().shape({
-        name: yup.string().required('Vui lòng nhập tên ngôn ngữ')
-    });
 
-    const {
-        register,
-        handleSubmit,
-        reset,
-        setValue,
-        getValues,
-        formState: { errors }
-    } = useForm<CreateOrUpdateLanguageRequest>({
-        mode: 'onBlur',
-        resolver: yupResolver(validationSchema)
+    const [lazyState, setlazyState] = useState<SearchCompanyRequest>({
+        pageNumber: 1,
+        pageSize: 10,
+        filterSearch: null,
     });
 
     const { data, isLoading, refetch } = useQuery(
-        ['GetLanguages', filterSearch, pageNumber, pageSize],
+        ['GetLanguages', lazyState],
         () => {
             const param = {
-                filterSearch: filterSearch,
-                pageNumber: pageNumber,
-                pageSize: pageSize
+                filterSearch: lazyState.filterSearch,
+                pageNumber: lazyState.pageNumber,
+                pageSize: lazyState.pageSize
             };
             return languageService.getsPaging(param);
         },
@@ -52,6 +43,20 @@ const Languages = () => {
             keepPreviousData: true
         }
     );
+    const handleSearch = (event: any) => {
+        setlazyState({
+            ...lazyState,
+            filterSearch: event.target.value
+        });
+    }
+    const onPageChange = (event: any) => {
+        setlazyState({
+            ...lazyState,
+            pageNumber: event.page + 1,
+            pageSize: event.rows
+        })
+    }
+    const debouncedSearch = debounce(handleSearch, 600);
 
     const deleteLanguageMutation = useMutation((id: string) => languageService.delete(id));
     const confirmDelete = (data: any) => {
@@ -74,50 +79,20 @@ const Languages = () => {
     const onCreate = () => {
         setVisible(true);
     };
-    const addLanguageMutation = useMutation((data: CreateOrUpdateLanguageRequest) => languageService.create(data));
-    const addUpdateMutation = useMutation((data: CreateOrUpdateLanguageRequest) => languageService.update(data));
-    const handleCreateOrUpdate = (data: CreateOrUpdateLanguageRequest) => {
-        if (!!data.id) {
-            addUpdateMutation.mutate(data, {
-                onSuccess: () => {
-                    toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Chỉnh sửa ngôn ngữ thành công', life: 3000 });
-                    setVisible(false);
-                    refetch();
-                },
-                onError: (error: any) => {
-                    toast.current?.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.errors, life: 3000 });
-                    setVisible(false);
-                }
-            });
-        } else {
-            addLanguageMutation.mutate(data, {
-                onSuccess: () => {
-                    toast.current?.show({ severity: 'success', summary: 'Success', detail: 'Thêm mới ngôn ngữ thành công', life: 3000 });
-                    setVisible(false);
-                    refetch();
-                },
-                onError: (error: any) => {
-                    toast.current?.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.errors, life: 3000 });
-                    setVisible(false);
-                }
-            });
-        }
-
-        reset();
-    };
-    const handleCancel = () => {
-        reset();
-        setVisible(false);
-    };
 
     const onEdit = (data: CreateOrUpdateLanguageRequest) => {
-        setValue('id', data.id, { shouldValidate: true });
-        setValue('name', data.name, { shouldValidate: true });
+        setCurrentId(data.id);
         setVisible(true);
     };
 
-    const menu = useRef<Menu>(null);
-    const actionBodyTemplate = (rowData: any) => {
+    const handleCancel = () => {
+        setVisible(false);
+        refetch();
+    };
+
+    const actionBodyTemplate = (rowData: LanguageResponse) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const menu = useRef<Menu>(null);
         return (
             <>
                 <span className="p-column-title">Hành động</span>
@@ -149,7 +124,7 @@ const Languages = () => {
                     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mt-3 mb-3">
                         <div className="col-4">
                             <span className="block mt-2 md:mt-0 p-input-icon-right">
-                                <InputText type="search" onInput={(e: any) => setFilterSearch(e.target.value)} placeholder="Search..." className="w-full" />
+                                <InputText type="search" onChange={debouncedSearch} placeholder="Search..." className="w-full" />
                                 <i className="pi pi-search" />
                             </span>
                         </div>
@@ -163,33 +138,31 @@ const Languages = () => {
                         ref={dt}
                         value={data?.data?.items}
                         dataKey="id"
-                        paginator
-                        rows={10}
                         loading={isLoading}
-                        rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
                         emptyMessage="No users found."
-                        responsiveLayout="scroll"
                     >
-                        <Column field="name" header="Tên" sortable headerStyle={{ minWidth: '25rem' }}></Column>
+                        <Column field="name" header="Tên" headerStyle={{ minWidth: '25rem' }}></Column>
                         <Column header="Hành động" body={actionBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
                     </DataTable>
 
-                    <CreateLanguage
-                        visible={visible}
-                        errors={errors}
-                        onCancel={() => handleCancel()}
-                        onSubmit={handleSubmit(handleCreateOrUpdate)}
-                        register={register}
-                        getValues={getValues}
-                        isLoading={addLanguageMutation.isLoading} />
+                    <Paginator first={lazyState.pageNumber}
+                        rows={lazyState.pageSize}
+                        totalRecords={data?.data?.totalCount}
+                        rowsPerPageOptions={rowsPerPageOptions}
+                        onPageChange={onPageChange} leftContent>
+                    </Paginator>
 
+                    <CreateLanguage
+                        currentId={currentId}
+                        visible={visible}
+                        onCloseModal={() => handleCancel()}
+                    />
                     <ConfirmDialog />
                 </div>
             </div>
         </div>
     );
 };
+
 export default Languages;
