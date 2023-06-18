@@ -3,7 +3,9 @@ import api from "../api";
 import { PaginatedList } from "../paginatedList";
 import { CreateOrUpdateCompanyRequest } from "./dto/createOrUpdateCompanyRequest";
 import { CompanyResponse } from "./dto/companyResponse";
-import { SearchCompanyRequest } from "./dto/SearchCompanyRequest";
+import { SearchCompanyRequest } from "./dto/searchCompanyRequest";
+import { UpdateNextCallCompanyRequest } from "./dto/updateNextCallCompanyRequest";
+import { UpdateLastCallCompanyRequest } from "./dto/updateLastCallCompanyRequest";
 
 export const companyService = {
   create: (body: CreateOrUpdateCompanyRequest) => {
@@ -24,5 +26,11 @@ export const companyService = {
     return api.get<PaginatedList<CompanyResponse>>(ApiEndpoint.company, {
       params: params,
     });
+  },
+  updateLastCall: (body: UpdateLastCallCompanyRequest) => {
+    return api.put(`${ApiEndpoint.company}/last-call`, body);
+  },
+  updateNextCall: (body: UpdateNextCallCompanyRequest) => {
+    return api.put(`${ApiEndpoint.company}/next-call`, body);
   },
 };

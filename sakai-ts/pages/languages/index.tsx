@@ -10,11 +10,11 @@ import { Menu } from 'primereact/menu';
 import { languageService } from '../../services/language/languageService';
 import { CreateOrUpdateLanguageRequest } from '../../services/language/dto/createOrUpdateLanguageRequest';
 import { LanguageResponse } from '../../services/language/dto/languageResponse';
-import { SearchCompanyRequest } from '../../services/company/dto/SearchCompanyRequest';
 import debounce from 'lodash.debounce';
 import { Paginator } from 'primereact/paginator';
 import { rowsPerPageOptions } from '../../public/constant';
-import CreateLanguage from '../../components/languages/CreateLanguage';
+import { SearchCompanyRequest } from '../../services/company/dto/searchCompanyRequest';
+import CreateLanguage from '../../components/languages/createLanguage';
 
 const Languages = () => {
     const [visible, setVisible] = useState(false);

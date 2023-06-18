@@ -4,25 +4,27 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import React, { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from 'react-query';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Menu } from 'primereact/menu';
 import { CreateOrUpdateCompanyRequest } from '../../services/company/dto/createOrUpdateCompanyRequest';
 import { companyService } from '../../services/company/companyService';
-import CreateCompany from '../../components/companies/CreateCompany';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import { CompanyResponse } from '../../services/company/dto/companyResponse';
 import debounce from 'lodash.debounce';
 import { Paginator } from 'primereact/paginator';
-import { SearchCompanyRequest } from '../../services/company/dto/SearchCompanyRequest';
+import { SearchCompanyRequest } from '../../services/company/dto/searchCompanyRequest';
 import { rowsPerPageOptions } from '../../public/constant';
+import UpdateNextCallCompanyModal from '../../components/companies/updateNextCallCompanyModal';
+import UpdateLastCallCompanyModal from '../../components/companies/updateLastCallCompanyModal';
+import { Tooltip } from 'primereact/tooltip';
 
 const Companies = () => {
     const toast = useRef<Toast>(null);
+    const [currentId, setCurrentId] = useState<string>('');
+    const [visibleNextCall, setVisibleNextCall] = useState<boolean>(false);
+    const [visibleLastCall, setVisibleLastCall] = useState<boolean>(false);
     const dt = useRef(null);
     const router = useRouter();
 
@@ -80,6 +82,23 @@ const Companies = () => {
     const onEdit = (data: CreateOrUpdateCompanyRequest) => {
         router.push(`/companies/${data.id}`);
     };
+    const onUpdateNextCall = (data: CreateOrUpdateCompanyRequest) => {
+        setCurrentId(data.id);
+        setVisibleNextCall(true);
+    };
+    const onUpdateLastCall = (data: CreateOrUpdateCompanyRequest) => {
+        setCurrentId(data.id);
+        setVisibleLastCall(true);
+    };
+
+    const onCloseHandleNextCall = () => {
+        setVisibleNextCall(false);
+        refetch();
+    }
+    const onCloseHandleLastCall = () => {
+        setVisibleLastCall(false);
+        refetch();
+    }
     const handleSearch = (event: any) => {
         setlazyState({
             ...lazyState,
@@ -104,6 +123,14 @@ const Companies = () => {
                             command: () => onEdit(rowData)
                         },
                         {
+                            label: 'Cuộc gọi cuối',
+                            command: () => onUpdateLastCall(rowData)
+                        },
+                        {
+                            label: 'Cuộc gọi tiếp theo',
+                            command: () => onUpdateNextCall(rowData)
+                        },
+                        {
                             label: 'Xóa',
                             command: () => confirmDelete(rowData)
                         }
@@ -121,7 +148,19 @@ const Companies = () => {
         if (rowData.nextCall)
             return moment(rowData.nextCall).format('DD/MM/YYYY');
     };
-
+    const companyNameBodyTemplate = (rowData: CompanyResponse) => {
+        return <>
+            <span>{rowData.name}</span>
+            {
+                rowData.note && (
+                    <>
+                        <i className="pi pi-info-circle cursor-pointer knob ml-2" id={`${rowData.id}-tooltip`}></i>
+                        <Tooltip target={`#${rowData.id}-tooltip`} content={`${rowData.note}`} className="max-w-30rem" />
+                    </>
+                )
+            }
+        </>;
+    };
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -149,9 +188,8 @@ const Companies = () => {
                         loading={isLoading}
                         className="datatable-responsive"
                         emptyMessage="No companies found."
-                        responsiveLayout="scroll"
                     >
-                        <Column field="name" header="Tên công ty" headerStyle={{ minWidth: '5rem' }}></Column>
+                        <Column field='name' body={companyNameBodyTemplate} header="Tên công ty" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column field="connecter" header="Nhân sự" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column field="landline" header="Điện thoại bàn" headerStyle={{ minWidth: '5rem' }}></Column>
@@ -164,6 +202,16 @@ const Companies = () => {
 
                     <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
 
+                    <UpdateNextCallCompanyModal
+                        currentId={currentId}
+                        visible={visibleNextCall}
+                        onCloseModal={onCloseHandleNextCall}
+                    />
+                    <UpdateLastCallCompanyModal
+                        currentId={currentId}
+                        visible={visibleLastCall}
+                        onCloseModal={onCloseHandleLastCall}
+                    />
                     <ConfirmDialog />
                 </div>
             </div>

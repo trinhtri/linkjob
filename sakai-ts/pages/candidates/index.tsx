@@ -12,6 +12,7 @@ import { Calendar } from 'primereact/calendar';
 import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { SearchCandidateCommonRequest } from '../../services/candidate/dto/searchCandidateRequest';
+import QuickCreateCandidate from '../../components/candidates/quickCreateCandidate';
 
 const Candidates = () => {
     const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -116,6 +117,15 @@ const Candidates = () => {
 
     }
 
+    const [visibleQuickCreate, setVisibleQuickCreate] = useState<boolean>(false);
+    const onHandleQuickCreate = () => {
+        setVisibleQuickCreate(true);
+    }
+    const onCloseModalQuickCreate = () => {
+        setVisibleQuickCreate(false);
+        console.log("onCloseModalQuickCreate");
+    }
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -125,6 +135,7 @@ const Candidates = () => {
 
                         <div>
                             {/* <Button label="Export" icon="pi pi-upload" className="p-button-help mr-2 p-button-sm" onClick={exportCSV} /> */}
+                            <Button label="Thêm nhanh" icon="pi pi-plus" className="p-button-success mr-2 p-button-sm" onClick={onHandleQuickCreate} />
                             <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success mr-2 p-button-sm" onClick={onCreate} />
                         </div>
                     </div>
@@ -180,6 +191,10 @@ const Candidates = () => {
                         {Component}
                     </Suspense>
 
+                    <QuickCreateCandidate
+                        visible={visibleQuickCreate}
+                        onCloseModal={onCloseModalQuickCreate}
+                    />
                 </div>
             </div>
         </div>

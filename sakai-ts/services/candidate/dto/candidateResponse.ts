@@ -19,5 +19,5 @@ export interface CandidateResponse {
   cvUrl: string;
   graduationYear: string;
   status: string;
-  content: string;
+  note: string;
 }

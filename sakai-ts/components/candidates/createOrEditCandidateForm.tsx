@@ -14,9 +14,7 @@ import { MultiSelect } from "primereact/multiselect";
 import { CommonLookupRequest } from "../../services/commonLookup/dto/commonLookupRequest";
 import { commonLookupService } from "../../services/commonLookup/commonLookupService";
 import { InputNumber } from "primereact/inputnumber";
-import { FileUpload } from "primereact/fileupload";
 import axios from "axios";
-import { config } from "process";
 import getConfig from "next/config";
 
 interface Props {

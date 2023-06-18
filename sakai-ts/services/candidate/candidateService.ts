@@ -2,11 +2,13 @@ import api from "../api";
 import { ApiEndpoint } from "../api-endpoint";
 import { PaginatedList } from "../paginatedList";
 import { AcceptOfferRequest } from "./dto/acceptOfferRequest";
+import { CandidateHistoryResponse } from "./dto/candidateHistoryResponse";
 import { CandidateInterviewResponse } from "./dto/candidateInterviewResponse";
 import { CandidateInterviewedResponse } from "./dto/candidateInterviewedResponse";
 import { CandidateResponse } from "./dto/candidateResponse";
 import { CountForStatusResponse } from "./dto/countForStatusResponse";
 import { CreateOrEditCandidateRequest } from "./dto/createOrEditCandidateRequest";
+import { QuickCreateCandidateRequest } from "./dto/quickCreateCandidateRequest";
 import { SendCVRequest } from "./dto/sendCVRequest";
 import { SetInterviewScheduleRequest } from "./dto/setInterviewScheduleRequest";
 import { SetInterviewedRequest } from "./dto/setInterviewedRequest";
@@ -15,6 +17,9 @@ import { SetPassInterviewRequest } from "./dto/setPassInterviewRequest";
 export const candidateService = {
   create: (body: any) => {
     return api.post(ApiEndpoint.candidate, body);
+  },
+  quickCreate: (body: QuickCreateCandidateRequest) => {
+    return api.post(`${ApiEndpoint.candidate}/quick-create`, body);
   },
   update: (body: any) => {
     return api.put(ApiEndpoint.candidate, body);
@@ -75,6 +80,11 @@ export const candidateService = {
       {
         params: params,
       }
+    );
+  },
+  getsCandidateHistories: (id: string) => {
+    return api.get<CandidateHistoryResponse[]>(
+      `${ApiEndpoint.candidate}/${id}/candidate-histories`
     );
   },
   sendCV: (body: SendCVRequest) => {

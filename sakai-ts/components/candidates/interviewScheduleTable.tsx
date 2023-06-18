@@ -19,6 +19,7 @@ import moment from 'moment';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
 import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { SetInterviewedRequest } from '../../services/candidate/dto/setInterviewedRequest';
+import Link from 'next/link';
 interface Props {
     filter: SearchCandidateCommonRequest,
     onReloadCountStatus: () => void;
@@ -187,6 +188,11 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
     const interviewTemplate = (rowData: CandidateInterviewResponse) => {
         return moment(rowData.interviewSchedule).format('DD/MM/YYYY HH:mm');
     }
+    const fullNameBodyTemplate = (rowData: any) => {
+        return <>
+            <Link href={`candidates/detail/${rowData.id}`}>{rowData.fullName}</Link>
+        </>;
+    };
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -198,7 +204,7 @@ const InterviewScheduleTable = ({ filter, onReloadCountStatus }: Props) => {
                     className="datatable-responsive"
                     emptyMessage="No users found."
                 >
-                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '4rem' }} ></Column>
+                    <Column body={fullNameBodyTemplate} header="Họ tên" headerStyle={{ minWidth: '4rem' }} ></Column>
                     <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '4rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '4rem' }} ></Column>
                     <Column field="companyName" header="Tên Cty" headerStyle={{ minWidth: '5rem' }} ></Column>

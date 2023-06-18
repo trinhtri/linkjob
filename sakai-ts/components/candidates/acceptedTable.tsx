@@ -17,6 +17,7 @@ import SendCV from './sendCV';
 import { SearchCandidateCommonRequest, SearchCandidateRequest } from '../../services/candidate/dto/searchCandidateRequest';
 import { formatCurrency } from '../../public/utilities/formatCurrency';
 import { CandidateInterviewResponse } from '../../services/candidate/dto/candidateInterviewResponse';
+import Link from 'next/link';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -164,6 +165,11 @@ const AcceptedTable = ({ filter }: Props) => {
     const salaryBodyTemplate = (rowData: CandidateInterviewResponse) => {
         return formatCurrency(rowData.salary as number);
     };
+    const fullNameBodyTemplate = (rowData: any) => {
+        return <>
+            <Link href={`candidates/detail/${rowData.id}`}>{rowData.fullName}</Link>
+        </>;
+    };
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -175,7 +181,7 @@ const AcceptedTable = ({ filter }: Props) => {
                     className="datatable-responsive"
                     emptyMessage="No users found."
                 >
-                    <Column field="fullName" header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column body={fullNameBodyTemplate} header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="companyName" header="Cty nhận" headerStyle={{ minWidth: '5rem' }} ></Column>
