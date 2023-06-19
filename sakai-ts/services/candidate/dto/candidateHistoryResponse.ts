@@ -6,4 +6,5 @@ export interface CandidateHistoryResponse {
   scheduleInterview: Date | null;
   startDate: Date | null;
   note: string | null;
+  wish: string | null;
 }

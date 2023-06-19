@@ -62,6 +62,7 @@ const CreateOrEditCompanyForm = ({ id }: Props) => {
             setValue('landline', companyDetail.data.landline);
             setValue('phoneNumber', companyDetail.data.phoneNumber);
             setValue('note', companyDetail.data.note);
+            setValue('fieldOfActivity', companyDetail.data.fieldOfActivity);
 
             if (companyDetail.data.lastCall) {
                 setLastCall(new Date(companyDetail.data.lastCall));
@@ -193,9 +194,13 @@ const CreateOrEditCompanyForm = ({ id }: Props) => {
                         ></Calendar>
                     </div>
 
-                    <div className="field col-12 md:col-12">
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="fieldOfActivity">Lĩnh vực hoạt động</label>
+                        <InputText id="fieldOfActivity"  {...register('fieldOfActivity')} className={`form-control ${errors.fieldOfActivity ? 'p-invalid' : ''}`} />
+                    </div>
+                    <div className="field col-12 md:col-6">
                         <label htmlFor="note">Ghi chú</label>
-                        <InputTextarea autoResize rows={3} cols={30}   {...register("note")} />
+                        <InputText id="note"  {...register('note')} className={`form-control ${errors.note ? 'p-invalid' : ''}`} />
                     </div>
                 </div>
                 <div className="col-12 flex md:justify-content-end">

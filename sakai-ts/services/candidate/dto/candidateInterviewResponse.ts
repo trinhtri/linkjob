@@ -8,5 +8,6 @@ export interface CandidateInterviewResponse {
   companyName: string;
   cvName: string;
   cvUrl: string;
+  position: string | null;
   interviewSchedule: Date | null;
 }

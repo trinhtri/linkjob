@@ -151,14 +151,14 @@ const Companies = () => {
     const companyNameBodyTemplate = (rowData: CompanyResponse) => {
         return <>
             <span>{rowData.name}</span>
-            {
+            {/* {
                 rowData.note && (
                     <>
                         <i className="pi pi-info-circle cursor-pointer knob ml-2" id={`${rowData.id}-tooltip`}></i>
-                        <Tooltip target={`#${rowData.id}-tooltip`} content={`${rowData.note}`} className="max-w-30rem" />
+                        <Tooltip target={`.${rowData.id}-tooltip`} content={`${rowData.note}`} className="max-w-30rem" />
                     </>
                 )
-            }
+            } */}
         </>;
     };
     return (

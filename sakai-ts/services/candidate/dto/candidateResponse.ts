@@ -20,4 +20,5 @@ export interface CandidateResponse {
   graduationYear: string;
   status: string;
   note: string;
+  position: string;
 }

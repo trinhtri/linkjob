@@ -9,4 +9,5 @@ export interface CandidateInterviewedResponse {
   cvName: string;
   cvUrl: string;
   interviewSchedule: Date | null;
+  position: string | null;
 }

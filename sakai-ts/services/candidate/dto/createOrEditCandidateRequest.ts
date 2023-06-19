@@ -18,4 +18,6 @@ export interface CreateOrEditCandidateRequest {
   languages: string[];
   cvName: string;
   cvUrl: string;
+  supporter: string;
+  position: string;
 }

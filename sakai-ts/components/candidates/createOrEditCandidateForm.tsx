@@ -102,6 +102,7 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
             setValue('salary', candidateDetail.data.salary);
             setValue('cvName', candidateDetail.data.cvName);
             setValue('cvUrl', candidateDetail.data.cvUrl);
+            setValue('supporter', candidateDetail.data.supporter);
             setIsLoadingFile(true);
             setTimeout(() => {
                 setIsLoadingFile(false);
@@ -419,6 +420,18 @@ const CreateOrEditCandidateForm = ({ candidateId }: Props) => {
                         />
                         <small className="p-error">
                             {errors.homeTown?.message?.toString()}
+                        </small>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <label htmlFor="supporter">Người hỗ trợ </label>
+                        <InputText
+                            id="supporter"
+                            {...register("supporter")}
+                            className={`form-control ${errors.supporter ? "p-invalid" : ""
+                                }`}
+                        />
+                        <small className="p-error">
+                            {errors.supporter?.message?.toString()}
                         </small>
                     </div>
                 </div>

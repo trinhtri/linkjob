@@ -9,4 +9,5 @@ export interface CreateOrUpdateCompanyRequest {
   lastCall: Date | null;
   nextCall: Date | null;
   note: string | null;
+  fieldOfActivity: string | null;
 }

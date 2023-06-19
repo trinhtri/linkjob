@@ -198,7 +198,7 @@ const SearchJobTable = ({ filter, onReloadCountStatus }: Props) => {
                     <Column field="languages" header="Ngoại ngữ" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="experience" header="Kinh nghiệm" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="wish" header="Nguyện vọng" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="reporter" header="Người hỗ trợ" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="supporter" header="Người hỗ trợ" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={createdAtTemplate} header="Ngày tạo" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>

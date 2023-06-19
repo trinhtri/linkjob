@@ -211,6 +211,7 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     <Column field="companyName" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={createdAtTemplate} header="Ngày gửi CV" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="supporter" header="Người hỗ trợ" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
