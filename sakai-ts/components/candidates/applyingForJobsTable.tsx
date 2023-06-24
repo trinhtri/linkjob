@@ -21,6 +21,7 @@ import { CandidateInterviewResponse } from '../../services/candidate/dto/candida
 import moment from 'moment';
 import { SetInterviewedRequest } from '../../services/candidate/dto/setInterviewedRequest';
 import Link from 'next/link';
+import EditCompanyCandidate from './editCompanyCandidate';
 
 interface Props {
     filter: SearchCandidateCommonRequest,
@@ -30,7 +31,7 @@ interface Props {
 const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
     const [visibleSendCV, setVisibleSendCV] = useState<boolean>(false);
     const [visibleSchedule, setVisibleSchedule] = useState<boolean>(false);
-    const [visiblePassInterview, setVisiblePassInterview] = useState<boolean>(false);
+    const [visibleEditCompanyCandidate, setVisibleEditCompanyCandidate] = useState<boolean>(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [currentId, setCurrentId] = useState<string>("");
@@ -114,8 +115,20 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
         setCompanyName(data.companyName);
         setVisibleSchedule(true);
     }
+
+    const onEditCompanyCandidate = (data: any) => {
+        setCurrentId(data.id);
+        setCompanyId(data.companyId);
+        setVisibleEditCompanyCandidate(true);
+    }
+
     const handleCancelInterviewSchedule = () => {
         setVisibleSchedule(false);
+        onReloadCountStatus();
+        refetch();
+    };
+    const handleCancelCompanyCandidate = () => {
+        setVisibleEditCompanyCandidate(false);
         onReloadCountStatus();
         refetch();
     };
@@ -177,7 +190,11 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                             command: () => confirmRejectCV(rowData)
                         },
                         {
-                            label: 'Chỉnh sửa',
+                            label: 'Chỉnh sửa vị trí UT',
+                            command: () => onEditCompanyCandidate(rowData)
+                        },
+                        {
+                            label: 'Chỉnh sửa CV',
                             command: () => onEdit(rowData)
                         },
                         {
@@ -205,14 +222,15 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     emptyMessage="No users found."
                 >
                     <Column body={fullNameBodyTemplate} header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="companyName" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="position" header="Vị trí" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="supporter" header="Người hỗ trợ" headerStyle={{ minWidth: '5rem' }} ></Column>
+
                     <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="dateOfBirth" header="Năm sinh" headerStyle={{ minWidth: '3rem' }} ></Column>
-                    <Column field="companyName" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="position" header="Vị trí" headerStyle={{ minWidth: '5rem' }} ></Column>
                     {/* <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column> */}
                     <Column body={createdAtTemplate} header="Ngày gửi CV" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column field="supporter" header="Người hỗ trợ" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                 </DataTable>
                 <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>
@@ -227,6 +245,12 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     companyId={companyId}
                     companyName={companyName}
                     onCloseModal={() => handleCancelInterviewSchedule()}
+                />
+                <EditCompanyCandidate
+                 visible={visibleEditCompanyCandidate}
+                 candidateId={currentId}
+                 companyId={companyId}
+                 onCloseModal={() => handleCancelCompanyCandidate()}
                 />
                 <ConfirmDialog />
             </div>

@@ -10,4 +10,6 @@ export interface CreateOrUpdateCompanyRequest {
   nextCall: Date | null;
   note: string | null;
   fieldOfActivity: string | null;
+  isRuningJob: boolean;
+  isContracted: boolean;
 }

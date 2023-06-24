@@ -198,6 +198,8 @@ const Companies = () => {
                         {/* <Column field="phoneNumber" header="Điện thoại cá nhân" headerStyle={{ minWidth: '5rem' }}></Column> */}
                         <Column body={lastCallBodyTemplate} header="Cuộc gọi cuối" headerStyle={{ minWidth: '5rem' }} ></Column>
                         <Column body={nextCallBodyTemplate} header="Ngày gọi tiếp theo" headerStyle={{ minWidth: '5rem' }}></Column>
+                        <Column field="isContracted" header="Đã kí HĐ" headerStyle={{ minWidth: '5rem' }}></Column>
+                        <Column field="isRuningJob" header="Đang chạy job" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column field="address" header="Địa chỉ" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                     </DataTable>

@@ -9,4 +9,6 @@ export interface CompanyResponse {
   lastCall: Date | null;
   nextCall: Date | null;
   note: string | null;
+  isRuningJob: boolean;
+  isContracted: boolean;
 }

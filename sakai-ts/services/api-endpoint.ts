@@ -7,4 +7,5 @@ export const ApiEndpoint = {
   role: "roles",
   language: "languages",
   company: "companies",
+  companyCandidate: "company-candidates",
 };

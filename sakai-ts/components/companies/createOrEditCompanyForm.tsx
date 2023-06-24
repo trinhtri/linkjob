@@ -9,8 +9,8 @@ import { Toast } from "primereact/toast";
 import { useRouter } from "next/router";
 import { CreateOrUpdateCompanyRequest } from "../../services/company/dto/createOrUpdateCompanyRequest";
 import { companyService } from "../../services/company/companyService";
-import { InputTextarea } from "primereact/inputtextarea";
 import { Calendar } from "primereact/calendar";
+import { Checkbox } from "primereact/checkbox";
 
 interface Props {
     id?: string,
@@ -46,6 +46,8 @@ const CreateOrEditCompanyForm = ({ id }: Props) => {
         handleSubmit,
         reset,
         setValue,
+        getValues,
+        watch,
         formState: { errors },
     } = useForm<CreateOrUpdateCompanyRequest>({
         mode: "onBlur",
@@ -63,6 +65,8 @@ const CreateOrEditCompanyForm = ({ id }: Props) => {
             setValue('phoneNumber', companyDetail.data.phoneNumber);
             setValue('note', companyDetail.data.note);
             setValue('fieldOfActivity', companyDetail.data.fieldOfActivity);
+            setValue('isContracted', companyDetail.data.isContracted);
+            setValue('isRuningJob', companyDetail.data.isRuningJob);
 
             if (companyDetail.data.lastCall) {
                 setLastCall(new Date(companyDetail.data.lastCall));
@@ -201,6 +205,20 @@ const CreateOrEditCompanyForm = ({ id }: Props) => {
                     <div className="field col-12 md:col-6">
                         <label htmlFor="note">Ghi chú</label>
                         <InputText id="note"  {...register('note')} className={`form-control ${errors.note ? 'p-invalid' : ''}`} />
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Checkbox inputId="isContracted"
+                         checked={watch('isContracted')}
+                         onChange={(e) => setValue('isContracted', e.checked ?? false)}
+                          />
+                        <label htmlFor="isContracted" className="p-checkbox-label mb-0 ml-2" >Đã kí hợp đồng</label>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Checkbox inputId="isRuningJob"
+                            checked={watch('isRuningJob')}
+                            onChange={(e) => setValue('isRuningJob', e.checked ?? false)}
+                           />
+                        <label htmlFor="isRuningJob" className="p-checkbox-label mb-0 ml-2">Đang chạy job</label>
                     </div>
                 </div>
                 <div className="col-12 flex md:justify-content-end">
