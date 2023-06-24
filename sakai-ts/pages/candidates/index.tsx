@@ -55,7 +55,6 @@ const Candidates = () => {
     });
 
     const onHandlerReloadCountStatus = () => {
-        console.log("nguyen hong");
         refetch();
     }
 

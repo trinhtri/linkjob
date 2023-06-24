@@ -200,7 +200,6 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                 <DataTable
                     ref={dt}
                     value={data?.data?.items}
-                    // dataKey="id"
                     loading={isLoading}
                     className="datatable-responsive"
                     emptyMessage="No users found."
@@ -208,8 +207,10 @@ const ApplyingForJobsTable = ({ filter, onReloadCountStatus }: Props) => {
                     <Column body={fullNameBodyTemplate} header="Họ tên" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="phoneNumber" header="Số điện thoại" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="dateOfBirth" header="Năm sinh" headerStyle={{ minWidth: '3rem' }} ></Column>
                     <Column field="companyName" header="Cty PV" headerStyle={{ minWidth: '5rem' }} ></Column>
-                    <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    <Column field="position" header="Vị trí" headerStyle={{ minWidth: '5rem' }} ></Column>
+                    {/* <Column body={salaryBodyTemplate} header="Lương" headerStyle={{ minWidth: '5rem' }} ></Column> */}
                     <Column body={createdAtTemplate} header="Ngày gửi CV" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column field="supporter" header="Người hỗ trợ" headerStyle={{ minWidth: '5rem' }} ></Column>
                     <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>

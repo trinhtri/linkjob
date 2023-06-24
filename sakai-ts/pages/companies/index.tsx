@@ -112,8 +112,9 @@ const Companies = () => {
         const menu = useRef<Menu>(null);
         return (
             <>
-                <span className="p-column-title">Hành động</span>
-                <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
+                <Button icon="pi pi-ellipsis-h" rounded severity="secondary" onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" />
+                {/* <span className="p-column-title">Hành động</span> */}
+                {/* <Button label="Hành động" icon="pi pi-cog " onClick={(e) => menu.current?.toggle(e)} className="p-button-outlined p-button-sm" /> */}
                 <Menu
                     ref={menu}
                     popup
@@ -191,13 +192,14 @@ const Companies = () => {
                     >
                         <Column field='name' body={companyNameBodyTemplate} header="Tên công ty" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column field="connecter" header="Nhân sự" headerStyle={{ minWidth: '5rem' }}></Column>
-                        <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }}></Column>
+                        <Column field="fieldOfActivity" header="Lĩnh vực hoạt động" headerStyle={{ minWidth: '5rem' }}></Column>
+                        {/* <Column field="email" header="Email" headerStyle={{ minWidth: '5rem' }}></Column> */}
                         <Column field="landline" header="Điện thoại bàn" headerStyle={{ minWidth: '5rem' }}></Column>
-                        <Column field="phoneNumber" header="Điện thoại cá nhân" headerStyle={{ minWidth: '5rem' }}></Column>
+                        {/* <Column field="phoneNumber" header="Điện thoại cá nhân" headerStyle={{ minWidth: '5rem' }}></Column> */}
                         <Column body={lastCallBodyTemplate} header="Cuộc gọi cuối" headerStyle={{ minWidth: '5rem' }} ></Column>
                         <Column body={nextCallBodyTemplate} header="Ngày gọi tiếp theo" headerStyle={{ minWidth: '5rem' }}></Column>
                         <Column field="address" header="Địa chỉ" headerStyle={{ minWidth: '5rem' }}></Column>
-                        <Column header="Hành động" body={actionBodyTemplate} headerStyle={{ minWidth: '2rem' }}></Column>
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '1rem' }}></Column>
                     </DataTable>
 
                     <Paginator first={lazyState.pageNumber} rows={lazyState.pageSize} totalRecords={data?.data?.totalCount} rowsPerPageOptions={rowsPerPageOptions} onPageChange={onPageChange} leftContent></Paginator>

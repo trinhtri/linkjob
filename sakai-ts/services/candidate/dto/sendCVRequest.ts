@@ -1,4 +1,5 @@
 export interface SendCVRequest {
-  id: string;
-  companies: string[];
+  candidateId: string;
+  companyId: string;
+  position: string;
 }
