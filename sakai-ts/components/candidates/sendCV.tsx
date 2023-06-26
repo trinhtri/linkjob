@@ -132,6 +132,8 @@ const SendCV = ({ visible, currentId, onCloseModal }: Props) => {
                                 setValue("companyId", e.target.value)
                             }
                             }
+                            filter
+                            filterBy="label"
                             className={`form-control ${errors.companyId ? "p-invalid" : ""}`}
                         />
                         <small className="p-error">
